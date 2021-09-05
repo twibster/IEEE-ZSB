@@ -1,0 +1,48 @@
+{% extends 'layout.html' %}
+{% block column %}
+<div class="col-md-4">
+	<div class="content-section">
+	    <h3 style="text-align: center;">States</h3>
+	    <p class='text-muted'>
+	      <ul class="list-group">
+	        <li class="list-group-item list-group-item-light"><b>Tasks:</b> {{dep.tasks}}</li>
+	        <li class="list-group-item list-group-item-light"><b>Submits:</b> {{dep.submits}}</li>
+	        <li class="list-group-item list-group-item-light"><b>Excuses:</b> {{dep.excuses}}</li>
+	        <li class="list-group-item list-group-item-light"><b>Announcements:</b> {{dep.announcements}}</li>
+	        <li class="list-group-item list-group-item-light"><b>Meetups:</b> {{dep.meetups}}</li>
+	      </ul>
+	    </p>
+	</div>
+</div>
+{% endblock %}
+{% block content %}
+<legend class="border-bottom mb-4" style="text-align: center;">{{dep.department}}</legend>
+<div class="content-section" enctype='multipart/form-data'>
+	<legend class="border-bottom mb-4" >Team Leaders</legend>
+	<div class="row">
+	  	{% for leader in leaders%}
+	  		<div class="col-sm-3 member">
+		        <a href = "{{url_for('profile',username = leader.username)}}">
+		        	<img class="rounded-circle dep-acc-img" src="{{url_for('static',filename='profile_pics/'+leader.image_file)}}"><br></br>
+		        </a>
+			       <small style="text-align:center;"><b>{{leader.first_name + ' ' + leader.last_name}}</b></small>
+			</div>
+		{% endfor %}
+	</div>
+</div>
+
+<div class="content-section" enctype='multipart/form-data'>
+	<legend class="border-bottom mb-4" >Team members</legend>
+	<div class="row">
+		{% for member in members %}
+			<div class="col-sm-3 member">
+		        <a href = "{{url_for('profile',username = member.username)}}">
+		        	<img class="rounded-circle dep-acc-img" src="{{url_for('static',filename='profile_pics/'+member.image_file)}}"><br></br>
+		        </a>
+			      <small><b>{{member.first_name + ' ' + member.last_name}}</b></small>
+	      	</div>
+	  	{% endfor %}
+	</div>
+</div>
+ 
+{% endblock content %}

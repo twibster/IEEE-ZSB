@@ -1,0 +1,194 @@
+{% extends 'layout.html' %}
+{% block content%}
+<!-- Task Filtering Form -->
+{% if due == False %}
+  <form method="POST" action="" enctype='multipart/form-data'>
+    {{ filter_form.hidden_tag() }}
+        <div class="form-group"style=' display: inline-block;'>
+            {% if filter_form.department.errors %}
+                {{ filter_form.department(class="form-control is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in filter_form.department.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% else %}
+                {{ filter_form.department(class="form-control") }}
+            {% endif %}
+        </div>
+        <div class="form-group"style=' display: inline-block;'>
+            {% if filter_form.sort.errors %}
+                {{ filter_form.sort(class="form-control is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in filter_form.sort.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% else %}
+                {{ filter_form.sort(class="form-control") }}
+            {% endif %}
+        </div>
+        <div class="form-group"style=' display: inline-block;'>
+            {% if filter_form.method.errors %}
+                {{ filter_form.method(class="form-control is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in filter_form.method.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% else %}
+                {{ filter_form.method(class="form-control") }}
+            {% endif %}
+        </div>
+        <div class="form-group" style='display: inline-block;'>
+          {{ filter_form.filter(class="btn btn-outline-info ") }}
+        </div>
+  </form>
+{% endif %}
+<!-- end of Task Filtering Form -->
+
+{% if current_user.department != 'All' and current_user.position in permissions['task_creators'] and due == False%}
+    <button type="button" class="btn btn-outline-info" style = 'width: 100%;' data-toggle="modal" data-target="#newModal" >+</button><br></br>
+{% endif%}
+  {% for task in tasks.items %}
+      <article class="media content-section">
+        <img class="rounded-circle data-img" src="{{url_for('static',filename='profile_pics/'+task.author.image_file)}}">
+        <div class="media-body breakAll">
+          <div class="article-metadata">
+            <a class="mr-2" href="{{url_for('profile',username = task.author.username)}}">{{ task.author.first_name + ' ' + task.author.last_name }}</a>
+            <small class="text-muted">{{ task.date_posted.strftime("%d/%m/%Y, %H:%M") }}</small>
+          </div>
+          <h2><a class="article-title" href="{{url_for('view_task',department= task.department,id = task.id,noti=0)}}">{{ task.title }}</a>
+
+            <small><a class="article-department" href="{{url_for('department',department = task.department)}}">{{task.department}}</a></small>
+          </h2>
+          {% if len(task.content) > 100 %}
+            <p class="article-content"> {{task.content[:70]}} .... <a href="{{url_for('view_task',department= task.department,id =task.id,noti= 0)}}">Read More</a>
+            </p>
+          {% else %}
+            <p class="article-content"> {{task.content}}</p>
+          {% endif %}
+          <div class="article-metadata">
+            {% set date = days(task.deadline) %}
+            {% if date <=0 %}
+                <small class="mr-2">due <b>{{days(task.deadline,state='abs')}}</b> days</small><br>
+            {% else %}
+                <small class="mr-2">Deadline: <b>{{task.deadline.strftime("%d/%m/%Y")}}</b> </small><br>
+            {% endif %}
+            {% if task.file %}
+                <a class="text-muted" href="{{url_for('get_file',location = location,filename = task.file)}}">{{task.file}}</a>
+            {% else %}
+                <a class="text-muted">No attachments provided</a>
+            {% endif %}
+          {% if current_user.is_authenticated %}
+              {% if task.submits.filter_by(user_id = current_user.id,task_id = task.id).first() %}
+                <small STYLE="color: #4BB543" class="btn-float-right">Submitted</small> 
+              {% elif task.excuses.filter_by(user_id= current_user.id,task_id=task.id).first() %}
+                <small STYLE="color: #FFCC00" class="btn-float-right">You have been excused</small>
+              {% endif %}
+           {% endif %} 
+          </div>
+        </div>
+      </article>
+
+<!-- Pagination -->
+{% endfor %}
+{% for page_num in tasks.iter_pages(right_edge = 1,left_edge = 1,left_current = 1,right_current = 2)%}
+{% if page_num %}
+  {% if not(tasks.page == 1 and tasks.has_next == False)%}
+    {% if tasks.page == page_num %}
+      <a class="btn btn-info mb-4" href=
+                "{{url_for(route,page = page_num,sort=sort,method=method,dep =dep,department=current_user.department)}}">{{page_num}}</a>
+    {% else %}
+      <a class="btn btn-outline-info mb-4" href="{{url_for(route,page = page_num,sort=sort,method=method,dep =dep,department=current_user.department)}}">{{page_num}}</a>
+    {% endif%}
+  {% endif %}
+{% else %}
+  ...
+{% endif%}
+{% endfor %}
+<!--  end of Pagination -->
+
+<!-- Task Creation Modal-->
+{% if due == False %}
+<div class="modal fade" id="newModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="deleteModalLabel">Create a new task</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <form method="POST" action="" enctype='multipart/form-data'>
+            <div class="modal-body">
+                {{ form.hidden_tag() }}
+                <div class="filter_form-group">
+                    {{ form.title.label(class="form-control-label") }}<span style="color:#ff0000">*</span>
+                    {% if form.title.errors %}
+                        {{ form.title(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.title.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.title(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    {{ form.content.label(class="form-control-label") }}<span style="color:#ff0000">*</span>
+
+                    {% if form.content.errors %}
+                        {{ form.content(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.content.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.content(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+                <div class="form-group" enctype='multipart/form-data'>
+                      {{ form.file.label() }}
+                      {{ form.file(class="form-control-file") }}
+                      {% if form.file.errors %}
+                          {% for error in form.file.errors %}
+                              <span class="text-danger">{{ error }}</span></br>
+                          {% endfor %}
+                      {% endif %}
+                </div>
+                <div class="form-group">
+                    {{ form.deadline.label(class="form-control-label") }}<span style="color:#ff0000">*</span>
+                    {% if form.deadline.errors %}
+                        {{ form.deadline(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.deadline.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.deadline(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                {{ form.submit(class="btn btn-info") }}
+            </div>
+        </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+<!-- end of Task Creating Modal-->
+{% if due ==False %}
+    {% if form.title.errors%}
+        <script>
+            $(document).ready(function(){
+               $("#newModal").modal();
+            });
+        </script>
+    {% endif %}
+{% endif %}
+{% endblock content %}

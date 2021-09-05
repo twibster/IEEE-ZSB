@@ -1,0 +1,314 @@
+{% extends 'layout.html' %}
+{% block column %}
+<div class="col-md-4">
+  <div class="content-section">
+    <h3 style="text-align: center;">
+      <a class='article-title' href="{{url_for('submits',department = task.department,task_id = task.id)}}">Submits</a>
+      <small class='article-department'>({{submits.count()}})</small>
+    </h3>
+    <p class='text-muted'>
+      <ul class="list-group">
+          <li class="list-group-item list-group-item-light" style="overflow-x: auto;">
+            <div class="row" style="width:300px;">
+                {% for submit in submits %}
+                  <div class="col member">
+                      <a style="
+                      {% if submit.score %}
+                        color:green;
+                      {% endif %}"
+                      href = "{{url_for('view_submit',department = task.department,
+                                            id =submit.task.id,submit_id = submit.id,noti=0)}}">
+                        <img class="rounded-circle sub-acc-img" src="{{url_for('static',filename='profile_pics/'+submit.submitter.image_file)}}"><br></br>
+                        <p style="font-weight: 500; font-size: 80%">{{submit.submitter.last_name}}</p>
+                      </a>
+                  </div>
+                {% endfor %}
+            </div>
+          </li>
+      </ul>
+    </p>
+  </div>
+  <div class="content-section">
+    <h3 style="text-align: center;">Excuses <small class='article-department'>({{excuses.count()}})</small></h3>
+    <p class='text-muted'>
+      <ul class="list-group">
+        {% for excuse in excuses %}
+          <li class="list-group-item list-group-item-light"><b>{{excuse.excuser.last_name}}: </b>{{excuse.notes}}</li>
+        {% endfor %}
+      </ul>
+    </p>
+  </div>
+  <div class="content-section">
+    <h3 style="text-align: center;">Missed <small class='article-department'>({{missed.count()}})</small></h3>
+    <p class='text-muted'>
+      <ul class="list-group">
+          <li class="list-group-item list-group-item-light" style="overflow-x: auto;">
+            <div class="row" style="width:400px;">
+                {% for miss in missed %}
+                  <div class="col">
+                      <a
+                        href = "{{url_for('profile',username = miss.misser.username)}}">
+                        <img class="rounded-circle sub-acc-img" src="{{url_for('static',filename='profile_pics/'+miss.misser.image_file)}}"><br></br>
+                        <p style="font-weight: 500; font-size: 80%">{{miss.misser.last_name}}</p>
+                      </a>
+                  </div>
+                {% endfor %}
+            </div>
+          </li>
+      </ul>
+    </p>
+  </div>
+</div>
+{% endblock column %}
+{% block content%}
+  <article class="media content-section">
+    <img class="rounded-circle data-img" src="{{url_for('static',filename='profile_pics/'+task.author.image_file)}}">
+    <div class="media-body breakAll">
+      <div class="article-metadata">
+        <a class="mr-2" href="{{url_for('profile',username = task.author.username)}}">{{ task.author.first_name + ' ' + task.author.last_name }}</a>
+        <small class="text-muted">{{ task.date_posted.strftime("%d/%m/%Y, %H:%M") }}</small>
+      </div>
+        <h2 class="article-title" >{{ task.title }}
+          <small class="text-muted">{{ task.department }}</small>
+        </h2>
+        <p class="article-content"> {{task.content}}</p>
+        <br>
+      <div class="article-metadata">
+        {% set date = days(task.deadline) %}
+            {% if date <=0 %}
+                <small class="mr-2">due <b>{{days(task.deadline,state='abs')}}</b> days</small><br>
+            {% else %}
+                <small class="mr-2">Deadline: <b>{{task.deadline.strftime("%d/%m/%Y")}}</b> </small><br>
+            {% endif %}
+          {% if task.file %}
+              <a class="text-muted" href="{{url_for('get_file',location = location,filename = task.file)}}">{{task.file}}</a>
+          {% else %}
+              <a class="text-muted">No attachments provided</a>
+          {% endif %}
+
+        {% if (current_user.department == task.department) and (current_user.position not in permissions['task_creators'])%}
+          {% if excuse %}
+            </div>
+            <small STYLE="color: #FFCC00" class="btn-float-right">You have been excused</small>
+          {% elif not submit %}
+            {% if task.deadline >= datetime.datetime.today() %}
+              </div>
+              <button type="button" class="btn btn-secondary btn-sm mt-1 mb-1" data-toggle="modal" data-target="#SubmitModal">Submit Task</button>
+              <button type="button" class="btn btn-warning btn-sm mt-1 mb-1" data-toggle="modal" data-target="#ExcuseModal">Excuse Yourself</button>
+            {% else %}
+              </div>
+              <p style="color: #ff0000;">You did not submit this task on time</p>
+            {% endif %}
+          {% else %}
+            <small STYLE="color: #4BB543" class="btn-float-right">Submitted</small>
+            </div>
+            {%if submit.score %}
+                <small><b>Score:</b> {{submit.score}}/10</small><br>
+                <small class= 'breakAll'><b>Notes:</b> {{submit.feedback}}</small>
+            {%else%}
+                <p>Your submit has not been reviewed yet</p>
+            {% endif %}
+          {% endif %}
+
+        {% elif (current_user.department == task.department and current_user.position not in permissions['task_submitters']) or current_user.position in permissions['announcers'] %}
+          </div>
+          <button type="button" class="btn btn-danger btn-sm m-1" data-toggle="modal" data-target="#deleteModal">Delete</button>
+          {% if current_user.department == task.department%}
+            <button type="button" class="btn btn-secondary btn-sm mt-1 mb-1" data-toggle="modal" data-target="#EditModal">Edit Task</button>
+          {% endif %}
+{#
+<!-- start of a comment in Jinja -->
+          <a class="btn-float-right" data-toggle="tooltip" data-placement="bottom" data-html="true"
+          title="
+          <div class = 'row'>
+            <div class='col'>
+              <b>By</b><br>
+              {% for submitter in submitters %}
+                {{ submitter.last_name }}<br>
+              {% endfor %}
+              <b>{{ submitters.count() }}</b>
+            </div>
+            <div class='col'>
+              <b>Yet</b><br>
+              {% for no_submitter in no_submitters %}
+                {{ no_submitter.last_name }}<br>
+              {% endfor %}
+              <b>{{ no_submitters.count() }}</b>
+            </div>
+          </div>
+          "
+          href="{{url_for('submits',department = task.department,task_id = task.id)}}">Submits</a>
+<!-- end of comment -->
+#}
+        {% endif %}
+  </article>
+  <!-- Modal -->
+  <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleted" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="deleted">Delete Task?</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class= "modal-body">
+            <p>This can not be undone</p>
+        </div>
+        <div class="modal-footer">
+          <form action="" method="POST">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+            <input class="btn btn-danger" type="submit" name='Delete' value="Delete">
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+   <div class="modal fade" id="EditModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="deleteModalLabel">Edit Task</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <form method="POST" action="" enctype='multipart/form-data'>
+          <div class= "modal-body">
+            {{ new_form.hidden_tag() }}
+              <div class="form-group">
+                  {{ new_form.title.label(class="form-control-label") }}
+                  {% if new_form.title.errors %}
+                      {{ new_form.title(class="form-control form-control-lg is-invalid") }}
+                      <div class="invalid-feedback">
+                          {% for error in new_form.title.errors %}
+                              <span>{{ error }}</span>
+                          {% endfor %}
+                      </div>
+                  {% else %}
+                      {{ new_form.title(class="form-control form-control-lg") }}
+                  {% endif %}
+              </div>
+              <div class="form-group">
+                  {{ new_form.content.label(class="form-control-label") }}
+
+                  {% if new_form.content.errors %}
+                      {{ new_form.content(class="form-control form-control-lg is-invalid") }}
+                      <div class="invalid-feedback">
+                          {% for error in new_form.content.errors %}
+                              <span>{{ error }}</span>
+                          {% endfor %}
+                      </div>
+                  {% else %}
+                      {{ new_form.content(class="form-control form-control-lg") }}
+                  {% endif %}
+              </div>
+              <div class="form-group">
+                    {{ new_form.file.label() }}
+                    {{ new_form.file(class="form-control-file") }}
+                    {% if new_form.file.errors %}
+                        {% for error in new_form.file.errors %}
+                            <span class="text-danger">{{ error }}</span></br>
+                        {% endfor %}
+                    {% endif %}
+              </div>
+              <div class="form-group">
+                {{ new_form.deadline.label(class="form-control-label") }}
+                {% if new_form.deadline.errors %}
+                    {{ new_form.deadline(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in new_form.deadline.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ new_form.deadline(class="form-control form-control-lg") }}
+                {% endif %}
+              </div>
+          </div>
+          <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+              {{ new_form.submit(class="btn btn-info") }}
+          </div>
+        </form>      
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="SubmitModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="deleteModalLabel">Submit Task</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <form method="POST" action="" enctype='multipart/form-data'>
+          <div class= "modal-body">
+            {{ submit_form.hidden_tag() }}
+              <div class="form-group">
+                    {{ submit_form.notes.label(class="form-control-label") }}
+
+                    {% if submit_form.notes.errors %}
+                        {{ submit_form.notes(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in submit_form.notes.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ submit_form.notes(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+                <div class="form-group" enctype='multipart/form-data'>
+                      {{ submit_form.file.label() }}
+                      {{ submit_form.file(class="form-control-file") }}
+                      {% if submit_form.file.errors %}
+                          {% for error in form.file.errors %}
+                              <span class="text-danger">{{ error }}</span></br>
+                          {% endfor %}
+                      {% endif %}
+                </div>
+          </div>
+          <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+              {{ submit_form.submit(class="btn btn-info") }}
+          </div>
+        </form>      
+      </div>
+    </div>
+  </div>
+<div class="modal fade" id="ExcuseModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteModalLabel">What is your Excuse?</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form method="POST" action="" enctype='multipart/form-data'>
+        <div class= "modal-body">
+          {{ Excuseform.hidden_tag() }}
+            <div class="form-group">
+                {% if Excuseform.notes.errors %}
+                    {{ Excuseform.notes(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in Excuseform.notes.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ Excuseform.notes(class="form-control form-control-lg") }}
+                {% endif %}
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+            {{ Excuseform.save(class="btn btn-info") }}
+        </div>
+      </form>      
+    </div>
+  </div>
+</div>
+{% endblock content %}

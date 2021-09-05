@@ -1,0 +1,135 @@
+{% extends 'layout.html' %}
+{% block content %}
+
+<!-- New Announcement Button -->
+{% if current_user.position in permissions['task_creators'] %}
+    <button type="button" class="btn btn-outline-info" style = 'width: 100%;' data-toggle="modal" data-target="#newModal" >Announce Something</button>
+{% endif %}
+<!-- end of New Announcement Button -->
+
+<!-- Announcements Displayer -->
+{% for announcement in announcements.items %}
+    {% set department =announcement.department %}
+    <article class="media content-section">
+        <img class="rounded-circle data-img" src="{{url_for('static',filename='profile_pics/'+announcement.announcer.image_file)}}">
+        <div class="media-body breakAll">
+          <div class="article-metadata">
+            <a class="mr-2" href="{{url_for('profile',username = announcement.announcer.username)}}">{{ announcement.announcer.first_name + ' ' + announcement.announcer.last_name }}</a>
+            <small class="text-muted">{{ announcement.date_announced.strftime("%d/%m/%Y, %H:%M") }}</small>
+          </div>
+          <h3>
+            for 
+            {% if department !='All' %}
+                <a class="article-title" href="{{url_for('department',department = department)}}">
+                    {{department}}
+                </a>
+            {% else %}
+                All departments
+            {% endif%}
+          </h3><br>
+           <p class="article-content"> {{announcement.content}}</p>
+
+            <small class="mr-2"><b>Valid Until</b>: {{announcement.validation_date.strftime("%d/%m/%Y, %H:%M")}}</small><br>
+            {% if current_user.id == announcement.announcer.id or current_user.position in permissions['announcers'] %}
+                <a href="{{url_for('announcements',department=department,id = announcement.id,noti=0)}}" 
+                class="btn btn-danger btn-sm m-1 btn-float-right">Delete</a>
+            {% endif %}
+        </div>
+    </article>
+{% endfor %}
+<!-- end of Announcements Displayer -->
+
+<!-- Pagination -->
+  {% for page_num in announcements.iter_pages(right_edge = 1,left_edge = 1,left_current = 1,right_current = 2)%}
+    {% if page_num %}
+      {% if not(announcements.page == 1 and announcements.has_next == False)%}
+        {% if announcements.page == page_num %}
+            {% set department =announcements.query.first().department %}
+          <a class="btn btn-info mb-4" href="{{url_for('announcements',page = page_num,department = department,id = 0,noti=0)}}">{{page_num}}</a>
+
+        {% else %}
+          <a class="btn btn-outline-info mb-4" href="{{url_for('announcements',page = page_num,department =department,id =0,noti=0)}}">{{page_num}}</a>
+        {% endif%}
+      {% endif %}
+    {% else %}
+      ...
+    {% endif%}
+  {% endfor %}
+<!--  end of Pagination -->
+
+<!-- start of Announcement Modal -->
+<div class="modal fade" id="newModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="deleteModalLabel">Announce something</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <form method="POST" action="" enctype='multipart/form-data'>
+                <div class="modal-body">
+                    {{ form.hidden_tag() }}
+                    {% if current_user.position in permissions['announcers'] %}
+                        <div class="form-group">
+                            {{ form.department.label(class="form-control-label") }}<span style="color:#ff0000">*</span>
+
+                            {% if form.department.errors %}
+                                {{ form.department(class="form-control form-control-lg is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.department.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.department(class="form-control form-control-lg") }}
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                    <div class="form-group">
+                        {{ form.content.label(class="form-control-label") }}<span style="color:#ff0000">*</span>
+
+                        {% if form.content.errors %}
+                            {{ form.content(class="form-control form-control-lg is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.content.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.content(class="form-control form-control-lg") }}
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        {{ form.validation_date.label(class="form-control-label") }}<span style="color:#ff0000">*</span>
+                        {% if form.validation_date.errors %}
+                            {{ form.validation_date(class="form-control form-control-lg is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.validation_date.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.validation_date(class="form-control form-control-lg") }}
+                        {% endif %}
+                    </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    {{ form.announce(class="btn btn-info") }}
+                </div>
+            </form>
+            </div>
+        </div>
+    </div>
+<!-- end of Announcement Modal -->
+
+<!-- start of Form Validation Error Displayer -->
+{% if form.validation_date.errors %}
+    <script>
+        $(document).ready(function(){
+           $("#newModal").modal();
+        });
+    </script>
+<!-- end of Form Validation Error Displayer -->
+{% endif %}
+{% endblock content %}

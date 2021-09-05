@@ -1,0 +1,38 @@
+{% extends 'layout.html' %}
+{% block content%}
+  <div class="content-section" enctype='multipart/form-data'>
+      <div style="text-align: center;">
+        <img class="rounded-circle profile-img" src="{{url_for('static',filename='profile_pics/'+to_view.image_file)}}">
+      </div>
+      <div class="media-body" style="text-align: center;">
+        <h2 class="account-heading">{{to_view.first_name + ' ' + to_view.last_name}}</h2>
+        <p class="text-secondary">{{to_view.email}}</p>
+      </div>
+      <div class='row' style="display: flex;justify-content: center;">
+        <legend class='border-bottom mb-4' style="text-align:center;">States</legend>
+        <div class ='col-auto'>
+            <p><b>Department:</b> {{to_view.department}}<p>
+            <p><b>Position:</b> {{to_view.position}}<p>
+            <p><b>Date Joined:</b> {{to_view.date_created.strftime("%d/%m/%Y")}}</p>
+        </div>
+        <div class ='col-auto'>
+            <p><b>Tasks Created:</b> {{len(to_view.tasks)}}</p>
+            <p><b>Tasks Submitted:</b> {{len(to_view.tasks_submitted)}}</p>
+            <p><b>Tasks Missed:</b> {{len(to_view.tasks_missed)}}</p>
+        </div>
+        <div class ='col-auto'>
+            <p><b>Announcements:</b> {{len(to_view.announcements)}}</p>
+            <p><b>Meet-ups:</b> {{len(to_view.meetups)}}</p>
+            <p><b>Avg Score:</b>
+            {% if to_view.position == 'Team Leader' and len(to_view.tasks) !=0 %} 
+              {{to_view.score/len(to_view.tasks)}}
+            {% elif to_view.position == 'Team Member' and len(to_view.tasks) !=0 %}
+              {{to_view.score/len(to_view.tasks_submitted)}}
+            {% else %}
+                0
+            {% endif %}
+            </p>
+        </div>
+      </div>
+  </div>  
+{% endblock content %}

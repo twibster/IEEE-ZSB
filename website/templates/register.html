@@ -1,0 +1,219 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class='row'>
+    <div class='col'>
+        <div class="content-section">
+            <form method="POST" action="">
+                {{ form.hidden_tag() }}
+                <div class='row'>
+                    <div class="col"style="padding-right:20px; border-right: 1px solid #ccc;">
+                        <legend class="border-bottom mb-4">Join Today</legend>
+                        <div class='row'>
+                            <div class='col'>
+                                <div class="form-group">
+                                    {{ form.first_name.label(class="form-control-label") }}<span style="color:#ff0000">*</span>
+                                    {% if form.first_name.errors %}
+                                        {{ form.first_name(class="form-control form-control-lg is-invalid") }}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.first_name.errors %}
+                                                <span>{{ error }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        {{ form.first_name(class="form-control form-control-lg") }}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class='col'>
+                                <div class="form-group">
+                                    {{ form.last_name.label(class="form-control-label") }}<span style="color:#ff0000">*</span>
+
+                                    {% if form.last_name.errors %}
+                                        {{ form.last_name(class="form-control form-control-lg is-invalid") }}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.last_name.errors %}
+                                                <span>{{ error }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        {{ form.last_name(class="form-control form-control-lg") }}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            {{ form.username.label(class="form-control-label") }}<span style="color:#ff0000">*</span>
+
+                            {% if form.username.errors %}
+                                {{ form.username(class="form-control form-control-lg is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.username.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.username(class="form-control form-control-lg") }}
+                            {% endif %}
+                        </div>
+                        <div class="form-group">
+                            {{ form.birthdate.label(class="form-control-label") }}<span style="color:#ff0000">*</span>
+                            {% if form.birthdate.errors %}
+                                {{ form.birthdate(class="form-control form-control-lg is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.birthdate.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.birthdate(class="form-control form-control-lg") }}
+                            {% endif %}
+                        </div>
+                        <div class="form-group">
+                            {{ form.email.label(class="form-control-label") }}<span style="color:#ff0000">*</span>
+                            {% if form.email.errors %}
+                                {{ form.email(class="form-control form-control-lg is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.email.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.email(class="form-control form-control-lg",placeholder="name@example.com") }}
+                            {% endif %}
+                        </div>
+                        <div class='row'>
+                            <div class='col'>
+                                <div class="form-group">
+                                    {{ form.password.label(class="form-control-label") }}<span style="color:#ff0000">*</span>
+                                    {% if form.password.errors %}
+                                        {{ form.password(class="form-control form-control-lg is-invalid") }}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.password.errors %}
+                                                <span>{{ error }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        {{ form.password(class="form-control form-control-lg") }}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class='col'>
+                                <div class="form-group">
+                                    {{ form.confirm_pass.label(class="form-control-label") }}<span style="color:#ff0000">*</span>
+
+                                    {% if form.confirm_pass.errors %}
+                                        {{ form.confirm_pass(class="form-control form-control-lg is-invalid") }}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.confirm_pass.errors %}
+                                                <span>{{ error }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        {{ form.confirm_pass(class="form-control form-control-lg") }}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class='col'>
+                        <legend class="border-bottom mb-4">Team Information</legend>
+                        <div class="form-group">
+                            {{ form.position.label(class="form-control-label") }}<span style="color:#ff0000">*</span>
+
+                            {% if form.position.errors %}
+                                {{ form.position(class="form-control form-control-lg is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.position.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.position(class="form-control form-control-lg",onload='check()') }}
+                            {% endif %}
+
+                            <script type="text/javascript">
+                                document.addEventListener("DOMContentLoaded", function() {
+
+                                        position = document.getElementById('position');
+                                        diff_pos =document.getElementById('diff_pos');
+                                        department_div =document.getElementById('department_div');
+                                        checked = document.getElementById('team_leader');
+
+                                    function pos(){
+                                        state = position.value;
+                                        if (state == 'IEEE Chairman'  || state== 'Vice Technical' || state== 'RAS Chairman' || state=='RAS Vice Chairman') {
+                                            department.selectedIndex= 0;
+                                            department_div.style.display='none';
+                                            diff_pos.style.display='block';
+                                        
+                                            
+                                        }   
+                                        else if ( state== 'Team Leader' || state=='Team Member'){
+                                            department_div.style.display='block';
+                                            diff_pos.style.display='none'
+                                            checked.checked =false
+                                            
+                                        }
+                                        else{
+                                            department_div.style.display='none';
+                                            department=document.getElementById('department');
+                                            department.selectedIndex= 1;
+                                            diff_pos.style.display='none';
+                                            checked.checked =false
+
+                                            }
+
+                                    }
+
+                                    function leader(){
+                                        if (checked.checked ==true){
+                                            department_div.style.display='block';
+                                        }
+                                        else{
+                                            department_div.style.display='none';
+                                        }
+                                    }
+                                    pos()
+                                    leader()
+            
+                                    position.onchange =function(){
+                                        pos();
+                                    }
+                                    checked.onchange =function(){
+                                        leader();
+                                    }
+                                });                                    
+                            </script>
+                        </div>
+                        <div class="form-check" id='diff_pos' style="display:none;">
+                            {{ form.team_leader(class="form-check-input") }}
+                            {{ form.team_leader.label(class="form-check-label") }}
+                            <br></br>
+                        </div>
+                        <div class="form-group" id='department_div' style="display:none;">
+                            {{form.department.label(class="form-control-label")}}<span style="color:#ff0000">*</span>
+                            {% if form.department.errors %}
+                                {{ form.department(class="form-control form-control-lg is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.department.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.department(class="form-control form-control-lg") }}
+                            {% endif %}
+                        </div>
+                        {{ form.submit(class="btn btn-outline-info btn-float-right") }}
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="border-top pt-3">
+            <small class="text-muted">
+                Already Have An Account? <a class="ml-2" href="{{ url_for('login') }}">Sign In</a>
+            </small>
+            <br></br>
+        </div>
+    </div>
+</div>
+{% endblock content %}

@@ -1,0 +1,44 @@
+{% extends 'layout.html' %}
+{% block content%}
+  <legend class="border-bottom mb-4" style='text-align: center;'>Notifications</legend>
+<div class='list-group'>
+   {% for notification in notifications_paginated.items %}
+     <a style ="margin-left:-5px;"class="list-group-item list-group-item-action"
+      href=
+     "
+     {% if notification.type !='submit'%}
+       {{url_for(notification.route,department = notification.sender.department,
+       id = notification.data_id,noti =notification.id)}}
+     {% else %}
+       {{url_for(notification.route,department = notification.sender.department,
+         id = notification.task.id,noti =notification.id,submit_id=notification.data_id)}}
+      {% endif %}
+      ">
+      <div class='media'>
+        <img class='rounded-circle noti-img' src=
+                                "{{url_for('static',filename='profile_pics/'+notification.sender.image_file)}}">
+        <div class='media-body'>
+          {{notification.data}}
+        </div>
+        <div class="article-department">
+          {{notification.date.strftime("%d/%m/%Y, %H:%M")}}
+        </div>
+      </div>
+     </a>
+   {% endfor %}
+</div>
+
+{% for page_num in notifications_paginated.iter_pages(right_edge = 1,left_edge = 1,left_current = 1,right_current = 2)%}
+  {% if page_num %}
+    {% if not(notifications.page == 1 and notifications.has_next == False)%}
+      {% if notifications.page == page_num %}
+        <a class="btn btn-info mb-4" href="{{url_for('notifications',page = page_num,user_id =current_user.id,mark_as_read =0)}}">{{page_num}}</a>
+      {% else %}
+        <a class="btn btn-outline-info mb-4" href="{{url_for('notifications',page = page_num,user_id =current_user.id,mark_as_read=0)}}">{{page_num}}</a>
+      {% endif%}
+    {% endif %}
+  {% else %}
+    ...
+  {% endif%}
+{% endfor %}
+{% endblock content %}

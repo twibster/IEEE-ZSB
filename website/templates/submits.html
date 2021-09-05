@@ -1,0 +1,49 @@
+{% extends 'layout.html' %}
+{% block content%}
+  <legend class="border-bottom mb-4" style="text-align: center;">Submits for {{task.title}} task</legend>
+  {%if not submits.items%}
+    <p>Probably you need to communicate with your team members more</p>
+  {%endif%}
+  {% for submit in submits.items %}
+    {% set submit_id = submit.id %}
+      <article class="media content-section">
+        <img class="rounded-circle data-img" src="{{url_for('static',filename='profile_pics/'+submit.submitter.image_file)}}">
+        <div class="media-body breakAll">
+          <div class="article-metadata">
+            <a class="mr-2" href="{{url_for('profile',username = submit.submitter.username)}}">{{ submit.submitter.first_name + ' ' + submit.submitter.last_name }}</a>
+            <small class="text-muted">{{ submit.date_submitted.strftime("%d/%m/%Y, %H:%M") }}</small>
+          </div>
+          <p class="article-content"> {{submit.notes}}</p>
+          <div class="article-metadata">
+            <small class="mr-2">{{days(submit.date_submitted,to_compare = task.deadline)}} days before the deadline</small><br>
+            {% if submit.file %}
+                <a class="text-muted" href="{{url_for('get_file',location = location,filename = submit.file)}}">{{submit.file}}</a>
+            {% else %}
+                <a class="text-muted">No attachments provided</a>
+            {% endif %}
+          </div>
+          {%if submit.score%}
+                <small><b>Score:</b> {{submit.score}}/10</small><br>
+                <small STYLE="color: #4BB543" class="btn-float-right">Feedbacked</small>
+          {% elif current_user.department == 'Deep Learning' and current_user.position not in permissions['task_submitters'] and not submit.score%}
+            <a class="btn-float-right" href="{{url_for('view_submit',department = task.department,id = submit.task.id,submit_id = submit.id,noti=0)}}">Give Feedback</a>
+          {% endif%}
+        </div>
+      </article>
+  {% endfor %}
+  
+  {% for page_num in submits.iter_pages(right_edge = 1,left_edge = 1,left_current = 1,right_current = 2)%}
+    {% if page_num %}
+      {% if not(submits.page == 1 and submits.has_next == False)%}
+        {% if submits.page == page_num %}
+          <a class="btn btn-info mb-4" 
+          href="{{url_for('submits',page = page_num,task_id =task.id,department=task.department)}}">{{page_num}}</a>
+        {% else %}
+          <a class="btn btn-outline-info mb-4" href="{{url_for('submits',page = page_num,task_id=task.id,department=task.department)}}">{{page_num}}</a>
+        {% endif%}
+      {% endif %}
+    {% else %}
+      ...
+    {% endif%}
+  {% endfor %}
+{% endblock content %}

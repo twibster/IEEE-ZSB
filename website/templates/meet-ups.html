@@ -1,0 +1,263 @@
+{% extends 'layout.html' %}
+{% block content %}
+
+<!-- New meetup Button -->
+{% if current_user.position in permissions['task_creators'] %}
+    <button type="button" class="btn btn-outline-info" style = 'width: 100%;' data-toggle="modal" data-target="#newModal" >Arrange a Meet-up</button><br></br>
+{% endif %}
+<!-- end of New meetup Button -->
+    
+<!-- meetups Displayer -->
+{% for meetup in meetups.items %}
+    {% set meetup_href = url_for('meetup',department=meetup.department,id = meetup.id,noti=0) %}
+    <article class="media content-section">
+        <img class="rounded-circle data-img" src="{{url_for('static',filename='profile_pics/'+meetup.organizer.image_file)}}">
+        <div class="media-body breakAll">
+          <div class="article-metadata">
+            <a class="mr-2" href="{{url_for('profile',username = meetup.organizer.username)}}">{{ meetup.organizer.first_name + ' ' + meetup.organizer.last_name }}</a>
+            <small class="text-muted">{{ meetup.date_created.strftime("%d/%m/%Y, %H:%M") }}</small>
+          </div>
+          <div class="article-metadata">
+            <h2><a class="article-title" href="{{meetup_href}}">{{ meetup.title }}</a>
+                {% if meetup.department !='All' %}
+                    <small><a class="article-department" href="{{url_for('department',department = meetup.department)}}">{{meetup.department}}</a> <small style='font-size: 12px'>({{meetup.state}})</small></small>
+                {% else %}
+                    <small class='article-department'>All departments <small style='font-size: 12px'>({{meetup.state}})</small></small>
+                {% endif%}
+            </h2>
+            <p class="article-content"> {{meetup.about}}</p>
+            <small class="mr-2"><b>Meeting time: </b>{{meetup.date}}</small>
+          </div>
+          {% if meetup.state=='Offline' %}
+            <a href="{{meetup_href}}">location</a>
+          {% endif %}
+        </div>
+    </article>
+{% endfor %}
+<!-- end of meetups Displayer -->
+
+<!-- Pagination -->
+  {% for page_num in meetups.iter_pages(right_edge = 1,left_edge = 1,left_current = 1,right_current = 2)%}
+    {% if page_num %}
+      {% if not(meetups.page == 1 and meetups.has_next == False)%}
+        {% if meetups.page == page_num %}
+            {% set department = meetups.query.first().department%}
+          <a class="btn btn-info mb-4" href="{{url_for('meetups',page = page_num)}}">{{page_num}}</a>
+        {% else %}
+          <a class="btn btn-outline-info mb-4" href="{{url_for('meetups',page = page_num)}}">{{page_num}}</a>
+        {% endif%}
+      {% endif %}
+    {% else %}
+      ...
+    {% endif%}
+  {% endfor %}
+<!--  end of Pagination -->
+
+<!-- start of Meetup Creation Modal -->
+<div class="modal fade" id="newModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="deleteModalLabel">Arrange a Meet-up</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <form method="POST" action="" enctype='multipart/form-data'>
+                <div class="modal-body">
+                    {{ form.hidden_tag() }}
+                    <div class='row'>
+                        <div class='col'>
+                            <div class="form-group">
+                                {{ form.title.label(class="form-control-label") }}<span style="color:#ff0000">*</span>
+
+                                {% if form.title.errors %}
+                                    {{ form.title(class="form-control form-control-lg is-invalid") }}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.title.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    {{ form.title(class="form-control form-control-lg") }}
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class='col'>
+                            <div class="form-group">
+                                {{ form.state.label(class="form-control-label") }}<span style="color:#ff0000">*</span>
+                                {% if form.state.errors %}
+                                    {{ form.state(class="form-control form-control-lg is-invalid") }}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.state.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    {{ form.state(class="form-control form-control-lg") }}
+                                {% endif %}
+                            </div>
+                            <script type="text/javascript">
+                                let state=document.getElementById('state');
+                                state.onchange = function () {
+                                    type =state.value;
+                                    map_object=document.getElementById('map_object');
+                                    if (type =='Online'){
+                                        map_object.style.display='none'
+                                    }
+                                    else
+                                        map_object.style.display='block'
+                                }
+                            </script>
+                        </div>
+                    </div>
+                    {% if current_user.position in permissions['announcers'] %}
+                        <div class="form-group">
+                            {{ form.department.label(class="form-control-label") }}<span style="color:#ff0000">*</span>
+
+                            {% if form.department.errors %}
+                                {{ form.department(class="form-control form-control-lg is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.department.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.department(class="form-control form-control-lg") }}
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                    <div class="form-group">
+                        {{ form.about.label(class="form-control-label") }}<span style="color:#ff0000">*</span>
+
+                        {% if form.about.errors %}
+                            {{ form.about(class="form-control form-control-lg is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.about.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.about(class="form-control form-control-lg") }}
+                        {% endif %}
+                    </div>
+                    <div class='row'>
+                        <div class="form-group col">
+                            {{ form.date.label(class="form-control-label") }}<span style="color:#ff0000">*</span>
+                            {% if form.date.errors %}
+                                {{ form.date(class="form-control form-control-lg is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.date.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.date(class="form-control form-control-lg") }}
+                            {% endif %}
+                        </div>
+                        <div class="form-group col">
+                            {{ form.time.label(class="form-control-label") }}<span style="color:#ff0000">*</span>
+                            {% if form.time.errors %}
+                                {{ form.time(class="form-control form-control-lg is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.time.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.time(class="form-control form-control-lg") }}
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="form-group" id='map_object'>
+                        <label class='form-control-label'>Location</label><span style="color:#ff0000">*</span>
+                        <small class='article-department'> ( The coordinates will be filled automatically )</small>
+                        <div id ="map" style='height: 400px;width: 100%;'></div><br>
+                        <script>
+                            const labels = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                            let labelIndex = 0;
+
+                            function initMap() {
+                              const where_am_i = { lat: 30.5765, lng: 31.5041 };
+                              const map = new google.maps.Map(document.getElementById("map"), {
+                                zoom: 12,
+                                center: where_am_i,
+                              });
+
+                              // This event listener calls addMarker() when the map is clicked.
+                              google.maps.event.addListener(map, "click", (event) => {
+                                document.getElementById("lat").value = event.latLng.lat();
+                                document.getElementById("long").value = event.latLng.lng();
+                                addMarker(event.latLng, map);
+                              });
+                            }
+                            
+                            // Adds a marker to the map.
+                            function addMarker(location, map) {
+                              var marker =new google.maps.Marker({
+                                draggable: true,
+                                position: location,
+                                label: labels[labelIndex++ % labels.length],
+                                map: map,
+                              });
+
+                            // this event listener changes the coordinates according to the poisition of the dragged marker.
+                            google.maps.event.addListener(marker, 'dragend', function (event) {
+                                document.getElementById("lat").value = event.latLng.lat();
+                                document.getElementById("long").value = event.latLng.lng();
+                              });
+                            }
+                        </script>
+                        <!-- Async script -->
+                        <script
+                          src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAtSICxgtzM_J7ZkgU6JNkWiMESnhN3PiM&callback=initMap&libraries=&v=weekly"
+                          async>
+                        </script>
+                        <div class='row'>
+                            <div class = 'col'>
+                                {% if form.lat.errors %}
+                                    <input class="form-control form-control-lg is-invalid" id="lat" name="lat" val="" placeholder='Latitude' />
+                                    <div class="invalid-feedback">
+                                        {% for error in form.lat.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                <input class="form-control form-control-lg" id="lat" name="lat" val="" placeholder='Latitude' />
+                                {% endif %}
+                            </div>
+                            <div class = 'col'>
+                                {% if form.long.errors %}
+                                    <input class="form-control form-control-lg is-invalid" id="long" name="long" val="" placeholder='Latitude' />
+                                    <div class="invalid-feedback">
+                                        {% for error in form.long.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                <input class="form-control form-control-lg" id="long" name="long" val="" placeholder='Latitude'/>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>            
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    {{ form.submit(class="btn btn-info") }}
+                </div>
+            </form>
+            </div>
+        </div>
+    </div>
+<!-- end of Meetup Creation Modal -->
+
+<!-- start of Form Validation Error Displayer -->
+{% if form.date.errors or form.long.errors or form.lat.errors %}
+    <script>
+        $(document).ready(function(){
+           $("#newModal").modal();
+        });
+    </script>
+{% endif %}
+<!-- end of Form Validation Error Displayer
+
+{% endblock content %}

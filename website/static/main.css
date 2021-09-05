@@ -1,0 +1,171 @@
+body {
+  background: #fafafa;
+  color: #333333;
+  margin-top: 5rem;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #444444;
+}
+
+.bg-steel {
+  background-color: #5f788a;
+}
+
+.site-header .navbar-nav .nav-link {
+  color: #cbd5db;
+}
+
+.breakAll {
+  word-wrap: break-word;
+}
+.badge{
+  float: right;
+}
+.btn-float-right{
+  float: right;
+}
+.site-header .navbar-nav .nav-link:hover {
+  color: #ffffff;
+}
+
+.site-header .navbar-nav .nav-link.active {
+  font-weight: 500;
+}
+.navbar-brand {
+    position: relative;
+    left: 15px;
+    background-size: contain;
+}
+.navbar-brand img{
+  float: left;
+  margin-left: -100px;
+  margin-top: -18px;
+  margin-bottom: -18px;
+  width: 60;
+  height: 55;
+}
+.test{
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.content-section {
+  background: #ffffff;
+  padding: 10px 20px;
+  border: 1px solid #dddddd;
+  border-radius: 3px;
+  margin-bottom: 20px;
+}
+
+.article-title {
+  color: #444444;
+}
+
+a.article-title:hover {
+  color: #428bca;
+  text-decoration: none;
+}
+
+.article-department{
+  color: #808080;
+}
+a.article-department:hover{
+  color: #428bca;
+  text-decoration: none;
+}
+
+.notification{
+  color: black;
+}
+a.notification:hover{
+  text-decoration: none
+}
+
+/*.popover{
+    max-width: ;  Max Width of the popover (depending on the container!) 
+}*/
+.article-content {
+  white-space: pre-line;
+}
+
+.article-img {
+  height: 65px;
+  width: 65px;
+  margin-right: 16px;
+}
+
+.article-metadata {
+  padding-bottom: 1px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid #e3e3e3
+}
+
+.article-metadata a:hover {
+  color: #333;
+  text-decoration: none;
+}
+
+.article-svg {
+  width: 25px;
+  height: 25px;
+  vertical-align: middle;
+}
+.profile-img{
+  height: 250px;
+  width: 250px;
+}
+.dep-acc-img{
+  height: 90px;
+  width: 90px;
+}
+.sub-acc-img{
+  height: 40px;
+  width: 40px;
+}
+.noti-img{
+  height: 40px;
+  width: 40px;
+  margin-left:-15px ;
+  margin-right: 10px;
+}
+
+.data-img {
+  height: 80px;
+  width: 80px;
+  margin-right: 20px;
+  margin-bottom: 16px;
+}
+.account-img {
+  height: 125px;
+  width: 125px;
+  margin-right: 20px;
+  margin-bottom: 16px;
+}
+
+.account-heading {
+  font-size: 2.5rem;
+}
+header img  {
+    display: block;
+    margin: 0 auto;
+}
+header span{
+    position: absolute;
+    top: 36%;
+    left: 18%;
+    font-size: 28px;
+    color: #fff;
+}
+.para{
+    margin-left: 13%;
+    width: 75%;
+}
+.btn-success{
+    margin-left: 42%;
+    margin-top: 2%;
+    cursor: pointer;
+}
+section{
+    margin-top:20px;
+}

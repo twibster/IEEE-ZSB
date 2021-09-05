@@ -1,0 +1,221 @@
+<html>
+<head>
+  <!-- Required meta tags -->
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+   <!-- Bootstrap CSS -->
+   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
+   <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+   <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
+
+   <link rel="stylesheet" type='text/css' href=" {{url_for('static',filename='main.css')}} ">
+   <link href="{{url_for('static',filename='img/favicon.png')}}" rel="shortcut icon" type="image/x-icon"/>
+  {% if title %}
+    <title>{{title}}</title>
+  {% else %}
+    <title>IEEE ZSB</title>
+  {% endif%}
+  {% block head %}{% endblock %}
+</head>
+<body>
+{% set logged_in =current_user.is_authenticated %}
+    <!-- Nav bar -->
+    <header class="site-header">
+      <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top" >
+        <div class="container">
+          <a class="navbar-brand" href="{{url_for('home')}}">
+            <img src="{{url_for('static',filename='img/logo2.png')}}" alt="">
+          </a>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarToggle">
+            <div class="navbar-nav mr-auto">
+              <a class="nav-item nav-link" href="{{url_for('home')}}">Home</a>
+              <a class="nav-item nav-link" href="{{url_for('about')}}">About</a>
+            </div>
+            <!-- Navbar Right Side -->
+            <div class="navbar-nav">
+              {% if logged_in %}
+                {%if notifications %}
+                  <a tabindex="0" class="nav-item nav-link" href='#' data-toggle="popover" data-trigger="focus" title="
+                  <b>Notifications</b>"
+                     data-placement="bottom" data-html="true" data-content="
+                     <div class='list-group'>
+                        {% if notifications.count() > 0 %}
+                         {% for notification in notifications.limit(5) %}
+                           <a style ='margin-left:-5px;'href='
+                           {% if notification.type !='submit'%}
+                             {{url_for(notification.route,department = notification.sender.department,
+                             id = notification.data_id,noti =notification.id)}}
+                           {% else %}
+                             {{url_for(notification.route,department = notification.sender.department,
+                               id = notification.task.id,noti =notification.id,submit_id=notification.data_id)}}
+                            {% endif %}
+                           '
+
+                           class='
+                           {% if notification.clicked == 0 %}
+                              list-group-item list-group-item-action list-group-item-info'
+                           {% else %}
+                              list-group-item list-group-item-action'
+                           {% endif %}
+                            >
+                            <div class='media'>
+                              <img class='rounded-circle noti-img' src='{{url_for('static',filename='profile_pics/'+notification.sender.image_file)}}'>
+                              <div class='media-body'>
+                                {{notification.data}}
+                              </div>
+                            </div>
+                            <div class='article-department'>
+                                <small class='btn-float-right'>{{notification.date.strftime('%d/%m/%Y, %H:%M')}}</small>
+                            </div>
+                           </a>
+                         {% endfor %}
+                        {% else %}
+                          <a class='list-group-item list-group-item-action' style ='margin-left:-5px;' href='#'>
+                            Woah!! No Notifications, Go find a wife.
+                          </a>
+                        {% endif %}
+                      </div>
+                      <div>
+                        <a href='{{url_for('notifications',user_id=current_user.id,mark_as_read=1)}}'>Mark all as read</a>
+                        <a class='btn-float-right' href='{{url_for('notifications',user_id=current_user.id,mark_as_read=0)}}'>View All</a>
+                      </div>
+                        ">
+
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" style='margin-top: 5px;'fill="currentColor" class="bi bi-bell" viewBox="0 0 16 16">
+                      <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2zM8 1.918l-.797.161A4.002 4.002 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4.002 4.002 0 0 0-3.203-3.92L8 1.917zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5.002 5.002 0 0 1 13 6c0 .88.32 4.2 1.22 6z"/>
+                    </svg>
+                    {% set count = notifications.filter_by(clicked=0).count() %}
+                    {% if count != 0%}
+                      <small class="badge badge-danger">{{count}}</small>
+                    {% endif %}
+                  </a>
+                {% endif %}
+                <a class="nav-item nav-link" href="{{url_for('account')}}">{{current_user.first_name}}'s settings</a>
+                <a class="nav-item nav-link" href="{{url_for('logout')}}">Logout</a>
+              {% else%}
+                <a class="nav-item nav-link" href="{{url_for('login')}}">Login</a>
+                <a class="nav-item nav-link" href="{{url_for('register')}}">Register</a>
+              {% endif%}
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script> 
+
+    <main role="main" class="container">
+      <div class="row">
+        {% set department = current_user.department %}
+        {% set task_creators =['IEEE Chairman','Vice Technical',"RAS Chairman",'RAS Vice Chairman',"Team Leader"]%}
+        {% if sidebar%}
+          <div class="col-md-4">
+            <div class="content-section">
+              <h3 style="text-align:center;">Keep Up</h3>
+              <p class='text-muted'>
+                <ul class="list-group">
+                  {% if department != 'All' %}
+                    <li class="list-group-item list-group-item-light">
+                      <a class = "article-department" href="{{url_for('due',
+                                  department = current_user.department)}}">
+                        {% if current_user.position in task_creators %}
+                          My Tasks
+                        {% else %}
+                          Due Tasks
+                        {% endif %}
+                      </a>
+                    </li>
+                    <li class="list-group-item list-group-item-light">
+                      <a class = "article-department" href="{{url_for('department',department=current_user.department)}}">
+                      My Department</a>
+                    </li>
+                  {% endif %}
+                  <li class="list-group-item list-group-item-light">
+                    <a class = "article-department" href="{{url_for('meetups')}}">Meet-ups</a>
+                  </li>
+                  <li class="list-group-item list-group-item-light">
+                    <a class = "article-department" href="{{url_for('announcements',
+                                department = current_user.department,id =0,noti =0)}}">Announcements</a>
+                  </li>
+                </ul>
+              </p>
+            </div>
+          </div>
+          {% endif %}
+          {% block column %}{% endblock %}
+          <div class="col" >
+            {% with messages = get_flashed_messages(with_categories = True)%}
+              {% if messages %}
+                {% for catagory,message in messages%}
+                <div class = 'alert alert-{{catagory}}'>
+                  {{message}}
+                  {% if 'Incorrect' in message%}
+                    <small class="text-muted ml-2">
+                      <a href="{{ url_for('reset_request',state = 1) }}">Click here to reset your password</a>
+                    </small>
+                  {% elif 'registered' in message%}
+                  <small class="text-muted ml-2">
+                      <a href="{{ url_for('register') }}">Click here to register</a>
+                    </small>
+                  {% endif %}
+                </div>
+                {% endfor %}
+              {% endif %}
+            {% endwith%}
+            {% block content %}{% endblock %}
+          </div>
+      </div>
+    </main>
+     <!-- <section id="footer">
+        <div class="container">
+            <div class="row">
+
+              <div class="col-md-9">
+
+                  <h3 class="text-black" >Contact Us:</h3>
+                  <ul class="list-group list-group-flush">
+                    <li class="list-group-item"> <i class="fas fa-home">   </i> Faculty of Engeneering, Zagazig university</li>
+                    <li class="list-group-item"> <i class="fa fa-envelope"></i>  info@ieee-zsb.org  </li>
+                  </ul>
+
+              </div>
+
+              <div class="col-md-3">
+
+                  <h3 class="text-black">Follow Us</h3>
+                  <div class="row">
+                    <div class="col-xs-12 col-sm-12 col-md-12 mt-2 mt-sm-5">
+                      <ul class="list-unstyled list-inline social text-center">
+                        <li class="list-inline-item"><a href="https://www.facebook.com/IEEEZSB"><i class="fab fa-facebook-square"></i></a></li>
+                        <li class="list-inline-item"><a href="https://twitter.com/ieeezsb"><i class="fab fa-twitter-square"></i></a></li>
+                        <li class="list-inline-item"><a href="https://www.linkedin.com/company/ieeezsb/"><i class="fab fa-linkedin"></i></a></li>
+                        <li class="list-inline-item"><a href="info@ieee-zsb.org" target="_blank"><i class="fa fa-envelope"></i></a></li>
+                      </ul>
+                    </div>
+                    </hr>
+                  </div>
+              </div>
+
+            </div>
+        </div>
+
+      </section> -->
+    <!-- ./Footer -->
+<script type="text/javascript">
+    $(function () {
+    $('[data-toggle="tooltip"]').tooltip()})
+</script>
+<script type="text/javascript">
+  $(function () {
+    $('[data-toggle="popover"]').popover()})
+</script>
+</body>
+</html>

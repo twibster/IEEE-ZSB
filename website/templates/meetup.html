@@ -1,0 +1,129 @@
+{% extends 'layout.html' %}
+{% block column %}
+<div class="col-md-4">
+  <div class="content-section">
+    <h3 style="text-align: center;">Attendees <small class='article-department'>({{len(confirms)}})</small></h3>
+    <p class='text-muted'>
+      <ul class="list-group">
+          <li class="list-group-item list-group-item-light" style="overflow-x: auto;">
+            <div class="row" style='width: 300px;'>
+                {% for confirm in confirms %}
+                  <div class="col member" style="text-align:center;">
+                      <a href = "{{url_for('profile',username = confirm.caser.username)}}">
+                        <img class="rounded-circle sub-acc-img" src="{{url_for('static',filename='profile_pics/'+confirm.caser.image_file)}}"><br></br>
+                        <p style="font-weight: 500; font-size: 80%">{{confirm.caser.last_name}}</p>   
+                      </a>
+                  </div>
+                {% endfor %}
+            </div>
+          </li>
+      </ul>
+    </p>
+  </div>
+  <div class="content-section">
+    <h3 style="text-align: center;">Excuses <small class='article-department'>({{len(excuses)}})</small></h3>
+    <p class='text-muted'>
+      <ul class="list-group">
+        {% for excuse in excuses %}
+          <li class="list-group-item list-group-item-light"><b>{{excuse.caser.last_name}}: </b>{{excuse.notes}}</li>
+        {% endfor %}
+      </ul>
+    </p>
+  </div>
+</div>
+{% endblock column %}
+{% block content%}
+<article class="media content-section">
+  <img class="rounded-circle data-img" src="{{url_for('static',filename='profile_pics/'+meetup.organizer.image_file)}}">
+  <div class="media-body breakAll">
+    <div class="article-metadata">
+      <a class="mr-2" href="{{url_for('profile',username = meetup.organizer.username)}}">{{ meetup.organizer.first_name + ' ' + meetup.organizer.last_name }}</a>
+      <small class="text-muted">{{ meetup.date_created.strftime("%d/%m/%Y, %H:%M") }}</small>
+    </div>
+    <div class="article-metadata">
+      <h2 class="article-title" >{{ meetup.title }}
+        <small class="text-muted">{{ meetup.department }}<small style='font-size: 12px'>({{meetup.state}})</small></small>
+      </h2>
+      <p class="article-content"> {{meetup.about}}</p>
+      <small class="mr-2"><b>Date: </b>{{meetup.date.strftime("%d/%m/%Y, %H:%M")}}</small><br></br>
+      {% if meetup.state=='Offline' %}
+        <legend class="border-bottom mb-4" style="text-align:center;"><b>location</b></legend>
+        <div class='article-metadata' id ="map" style='height: 500px;width: 100%px;'></div>
+        <script>
+            function initMap() {
+              const where_am_i = { lat: {{meetup.lat}}, lng: {{meetup.long}} };
+              const map = new google.maps.Map(document.getElementById("map"), {
+                zoom: 14,
+                center: where_am_i,
+              });
+              new google.maps.Marker({
+                position: where_am_i,
+                map,
+                label: 'H',
+                title: "Hello World!",
+              });
+            }
+        </script>
+      {% endif %}
+    </div>
+    <form method="post" action="">
+      {% if current_user.position in permissions['announcers'] or current_user.id== meetup.organizer.id%}
+          <input type='submit' value ='Delete' name='Delete' style='width: 15%;' 
+          href="{{url_for('meetups',department=meetup.department)}}" 
+          class="btn btn-danger btn-sm m-1 btn-float-right"/>
+      {% endif %}
+      {% if ((current_user.department == meetup.department or current_user.position in permissions['announcers']) or (meetup.department =='All')) and current_user.id != meetup.organizer.id %}
+        {% if not user_info %}
+            <input type="submit" class="btn btn-primary btn-sm mt-1 mb-1" name ='Confirm' 
+            value="Confirm your attendence"/>
+            <button type="button" class="btn btn-warning btn-sm mt-1 mb-1" data-toggle="modal" data-target="#ExcuseModal">Excuse Yourself</button>
+        {% else %}
+          {% if user_info.type == 'confirm'%}
+            <small STYLE="color: #4BB543" >You confirmed your attendence</small>
+          {% elif user_info.type == 'excuse' %}
+            <small STYLE="color: #FFCC00" >You have been excused</small>
+          {% endif %}
+        {% endif %}
+      {% endif %}
+    </form>
+  </div>
+</article>
+<script
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAtSICxgtzM_J7ZkgU6JNkWiMESnhN3PiM&callback=initMap&libraries=&v=weekly"
+  async>
+</script>
+
+<div class="modal fade" id="ExcuseModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteModalLabel">What is your Excuse?</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form method="POST" action="" enctype='multipart/form-data'>
+        <div class= "modal-body">
+          {{ Excuseform.hidden_tag() }}
+            <div class="form-group">
+                {% if Excuseform.notes.errors %}
+                    {{ Excuseform.notes(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in Excuseform.notes.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ Excuseform.notes(class="form-control form-control-lg") }}
+                {% endif %}
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+            {{ Excuseform.save(class="btn btn-info") }}
+        </div>
+      </form>      
+    </div>
+  </div>
+</div>
+{% endblock %}
