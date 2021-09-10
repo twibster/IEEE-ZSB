@@ -160,7 +160,7 @@
             <div class="tab-pane fade" id="Notifications">
                 <div class="content-section" enctype='multipart/form-data'>
                     <legend>Send me a notification when:</legend>
-                    {% if current_user.department != 'All' and current_user.position not in ['task_submitters'] %}
+                    {% if current_user.department != 'All' and current_user.position not in permissions['task_submitters'] %}
                         <div class="form-check">
                             {{ form.noti_submit(class="form-check-input") }}
                             {{ form.noti_submit.label(class="form-check-label") }}
@@ -194,7 +194,7 @@
                 </div>
                 <div class="content-section" enctype='multipart/form-data'>
                     <legend>Send me an email when:</legend>
-                    {% if current_user.department != 'All' and current_user.position not in ['task_submitters'] %}
+                    {% if current_user.department != 'All' and current_user.position not in permissions['task_submitters'] %}
                         <div class="form-check">
                             {{ form.email_submit(class="form-check-input") }}
                             {{ form.email_submit.label(class="form-check-label") }}
