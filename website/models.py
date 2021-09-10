@@ -44,7 +44,7 @@ class Notifications(db.Model):
     task_id = db.Column(db.Integer, db.ForeignKey('task.id'))
     clicked = db.Column(db.Boolean,default =False)
     to_id = db.Column(db.Integer)
-    from_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable = False)
+    from_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
     def __repr__(self):
         return f"Notifications('{self.id}','{self.type}','{self.data}','{self.data_id}','{self.to_id}','{self.from_id}')"

@@ -2,7 +2,15 @@ import datetime,random,os,secrets
 from website import mail,app,message
 from flask import render_template
 from threading import Thread
+from urlextract import URLExtract
 
+
+def url_extractor(field):
+    extractor = URLExtract()
+    urls = extractor.find_urls(field.data)
+    for url in urls:
+        field.data =field.data.replace(url,f"<a href='//{url}' target='_blank' rel='noopener noreferrer'>{url}</a>")
+    return field
 
 def days(date,to_compare = None,state = None):
     date = datetime.date(date.year,date.month,date.day)
@@ -54,7 +62,6 @@ def async_email(app,msg):
         try:
             mail.send(msg)
         except AssertionError:
-            print('no emails')
             pass
 
 def save_file(form_file,location):

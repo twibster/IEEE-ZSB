@@ -1,13 +1,41 @@
+import os,shutil
 from website import db
 
-db.drop_all()
-db.create_all()
+# reinitialize database tables
+def clear_database():
+
+	db.drop_all()
+	db.create_all()
+
+	return 'Database cleared successfully'
+
+# add the departments to their table (important to avoid errors in the registration view)
 from website.models import Department
+def add_departments():
+	departments =["Post-department",'Deep Learning',"PID Control","ROS","Kinematics","Embedded Systems","Maze Solving Algorithm","Mechanical"]
 
-departments =["Post-department",'Deep Learning',"PID Control","ROS","Kinematics","Embedded Systems","Maze Solving Algorithm","Mechanical"]
+	for department in departments:
+		dep = Department(department=department)
+		db.session.add(dep)
+		db.session.commit()
 
-for department in departments:
-	dep = Department(department=department)
-	db.session.add(dep)
-	db.session.commit()
+	return 'Departments added successfully'
 
+# clear media directory
+def clear_media():
+	media_path =os.path.join(os.getcwd(),'website','media')
+	shutil.rmtree(media_path,ignore_errors=True)
+
+	return 'Media directory cleared successfully'
+
+# clear profile_pics folder
+def clear_profile_pics():
+	profile_pics_path = os.path.join(os.getcwd(),'website','static','profile_pics')
+
+	for pic in os.listdir(profile_pics_path):
+		if pic != 'default.jpg':
+			os.remove(os.path.join(profile_pics,pic))
+
+	return 'Profile Pictures folder cleared successfully'
+
+print(clear_database(),add_departments(),clear_media(),clear_profile_pics(),sep='\n')

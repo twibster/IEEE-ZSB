@@ -1,4 +1,5 @@
 import bcrypt,datetime,random
+from bs4 import BeautifulSoup
 from flask import render_template,url_for,flash,redirect,request,send_from_directory,session,abort
 from website.forms import (RegistrationForm,LoginForm,ResetPasswordForm,AccountForm,
                             NewTaskForm,ResetRequestForm,SubmitTaskForm,FeedbackForm,
@@ -8,7 +9,7 @@ from website.models import (User,Task,Submit,Announce,Meetup,Meetup_Info,Excuses
 from website import app,db
 
 from flask_login import login_user,current_user,logout_user,login_required
-from website.functions import days,save_file,noti_text,mail_sender
+from website.functions import days,save_file,noti_text,mail_sender,url_extractor
 
 permissions={
     'task_creators':['IEEE Chairman','Vice Technical',"RAS Chairman",'RAS Vice Chairman',"Team Leader"],
@@ -121,6 +122,8 @@ def home(sort,method,dep):
 
     elif new_form.validate_on_submit() and new_form.submit.data:
 
+        new_form.content = url_extractor(new_form.content)
+
         new_task = Task(author = current_user ,title = new_form.title.data, content= new_form.content.data, 
             deadline = new_form.deadline.data,file = save_file(new_form.file.data,app.config['TASKS_FILE']),
             department = current_user.department,submits_count = 0)
@@ -172,7 +175,6 @@ def home(sort,method,dep):
         task = task.order_by(Task.deadline.desc()).paginate(per_page = 3)
     elif sort =='Submits Count' and method == 'desc':
         task = task.order_by(Task.submits_count.desc()).paginate(per_page = 3)
-    print(dep,sort,method)
     
     if request.method =='GET':
         filter_form.sort.data=sort
@@ -361,6 +363,9 @@ def view_task(department,id,noti):
     if not task:
         abort(404)
     elif new_form.validate_on_submit() and new_form.submit.data:
+
+        new_form.content = url_extractor(new_form.content)
+
         task.title = new_form.title.data
         task.content= new_form.content.data
         task.deadline = new_form.deadline.data
@@ -425,8 +430,9 @@ def view_task(department,id,noti):
         return(redirect(url_for('view_task',department = department,id =id,noti=0)))
 
     elif request.method == 'GET':
+        content = BeautifulSoup(task.content)
         new_form.title.data = task.title
-        new_form.content.data =task.content
+        new_form.content.data =content.get_text()
         new_form.file.data = task.file
         new_form.deadline.data = task.deadline
 
