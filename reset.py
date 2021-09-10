@@ -28,6 +28,13 @@ def clear_media():
 
 	return 'Media directory cleared successfully'
 
+# clear cache directory
+def clear_cache():
+	cache_path =os.path.join(os.getcwd(),'website','__pycache__')
+	shutil.rmtree(cache_path,ignore_errors=True)
+
+	return 'Cache directory cleared successfully'
+
 # clear profile_pics folder
 def clear_profile_pics():
 	profile_pics_path = os.path.join(os.getcwd(),'website','static','profile_pics')
@@ -38,4 +45,4 @@ def clear_profile_pics():
 
 	return 'Profile Pictures folder cleared successfully'
 
-print(clear_database(),add_departments(),clear_media(),clear_profile_pics(),sep='\n')
+print(clear_database(),add_departments(),clear_media(),clear_cache(),clear_profile_pics(),sep='\n')

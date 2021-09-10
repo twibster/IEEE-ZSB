@@ -63,15 +63,22 @@
             <small><a class="article-department" href="{{url_for('department',department = task.department)}}">{{task.department}}</a></small>
           </h2>
 
-{# disabled due to bugs
-          {% if len(task.content) > 300 %}
-            <p class="article-content"> {{task.content[:300]|safe}}'</a> .... <a href="{{url_for('view_task',department= task.department,id =task.id,noti= 0)}}">Read More</a>
-            </p>
+
+          {% if len(task.content) > 200 %}
+            {% if '</a>' in task.content %}
+                <p class="article-content"> {{task.content[:(task.content.index('</a>')+4)]|safe}}</a> .... <a 
+                    class='read-more' 
+                    href="{{url_for('view_task',department= task.department,id =task.id,noti= 0)}}">Read More</a>
+                </p>
+            {% else %}
+                <p class="article-content"> {{task.content[:200]}}'</a> .... <a class = 'read-more' 
+                    href="{{url_for('view_task',department= task.department,id =task.id,noti= 0)}}">Read More</a>
+                </p>
+            {% endif %}
           {% else %}
             <p class="article-content"> {{task.content|safe}}</p>
           {% endif %}
-#}
-          <p class="article-content"> {{task.content|safe}}</p>
+
           <div class="article-metadata">
             {% set date = days(task.deadline) %}
             {% if date <=0 %}
