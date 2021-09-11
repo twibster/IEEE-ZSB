@@ -62,13 +62,11 @@
 
             <small><a class="article-department" href="{{url_for('department',department = task.department)}}">{{task.department}}</a></small>
           </h2>
-
-
           {% if len(task.content) > 200 %}
-            {% if '</a>' in task.content %}
+            {% if '</a>' in task.content and task.content.index('<a') < 200 %}
                 <p class="article-content"> {{task.content[:(task.content.index('</a>')+4)]|safe}}</a> .... <a 
-                    class='read-more' 
-                    href="{{url_for('view_task',department= task.department,id =task.id,noti= 0)}}">Read More</a>
+                class='read-more' 
+                href="{{url_for('view_task',department= task.department,id =task.id,noti= 0)}}">Read More</a>
                 </p>
             {% else %}
                 <p class="article-content"> {{task.content[:200]}}'</a> .... <a class = 'read-more' 
