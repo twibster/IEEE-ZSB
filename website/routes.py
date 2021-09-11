@@ -430,7 +430,7 @@ def view_task(department,id,noti):
         return(redirect(url_for('view_task',department = department,id =id,noti=0)))
 
     elif request.method == 'GET':
-        content = BeautifulSoup(task.content)
+        content = BeautifulSoup(task.content,features="html.parser")
         new_form.title.data = task.title
         new_form.content.data =content.get_text()
         new_form.file.data = task.file
@@ -503,6 +503,7 @@ def announcements(department,id,noti):
     form = AnnouncementForm()
 
     if form.validate_on_submit():
+        form.content = url_extractor(form.content)
         if form.department.data =='Select a department' or not form.department.data:
             form.department.data=current_user.department
 
@@ -547,6 +548,7 @@ def announcements(department,id,noti):
 def meetups():
     form = MeetupForm()
     if form.validate_on_submit():
+        form.about = url_extractor(form.about)
         if form.department.data =='Select a department' or not form.department.data:
             form.department.data=current_user.department
 

@@ -27,7 +27,7 @@
                 All departments
             {% endif%}
           </h3><br>
-           <p class="article-content"> {{announcement.content}}</p>
+           <p class="article-content"> {{announcement.content|safe}}</p>
 
             <small class="mr-2"><b>Valid Until</b>: {{announcement.validation_date.strftime("%d/%m/%Y, %H:%M")}}</small><br>
             {% if current_user.id == announcement.announcer.id or current_user.position in permissions['announcers'] %}

@@ -25,7 +25,7 @@
                     <small class='article-department'>All departments <small style='font-size: 12px'>({{meetup.state}})</small></small>
                 {% endif%}
             </h2>
-            <p class="article-content"> {{meetup.about}}</p>
+            <p class="article-content"> {{meetup.about|safe}}</p>
             <small class="mr-2"><b>Meeting time: </b>{{meetup.date}}</small>
           </div>
           {% if meetup.state=='Offline' %}
