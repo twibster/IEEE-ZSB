@@ -14,7 +14,7 @@ from website.functions import days,save_file,noti_text,mail_sender,url_extractor
 permissions={
     'task_creators':['IEEE Chairman','Vice Technical',"RAS Chairman",'RAS Vice Chairman',"Team Leader"],
     'task_submitters':["Team Member","Rookie"],
-    'announcers':['IEEE Chairman','Vice Technical',"RAS Chairman",'RAS Vice Chairman']  
+    'announcers':['IEEE Chairman','Vice Technical',"RAS Chairman",'RAS Vice Chairman']
 }
 
 
@@ -91,7 +91,7 @@ def department(department):
     leaders = User.query.filter(User.department == department,User.position.in_(permissions['task_creators']))
     members = User.query.filter(User.department == department,User.position.in_(permissions['task_submitters']))
     to_display= Department.query.filter_by(department=department).first()
-   
+
     return render_template('department.html',leaders = leaders,notifications=noti_fetcher(),
         members = members, len =len,dep =to_display)
 
@@ -100,7 +100,7 @@ def department(department):
 def submits(department,task_id):
     form = FeedbackForm()
     return render_template('submits.html',days= days,
-        location = app.config['SUBMITS_FILE'],notifications=noti_fetcher(),
+        location = app.config['SUBMITS_FILE_DOWNLOAD'],notifications=noti_fetcher(),
         task = Task.query.get(task_id),permissions=permissions,
         submits = Submit.query.filter_by(task_id = task_id).order_by(Submit.date_submitted.desc()).paginate(per_page = 3))
 
@@ -124,7 +124,7 @@ def home(sort,method,dep):
 
         new_form.content = url_extractor(new_form.content)
 
-        new_task = Task(author = current_user ,title = new_form.title.data, content= new_form.content.data, 
+        new_task = Task(author = current_user ,title = new_form.title.data, content= new_form.content.data,
             deadline = new_form.deadline.data,file = save_file(new_form.file.data,app.config['TASKS_FILE']),
             department = current_user.department,submits_count = 0)
         db.session.add(new_task)
@@ -135,7 +135,7 @@ def home(sort,method,dep):
 
         recipients=[]
         for user in User.query.filter(User.department == new_task.department , User.position.not_in(permissions['task_creators'])):
-            
+
             if user.noti_settings.first().task:
                 noti = Notifications(type =type, data = text,route = route,data_id = new_task.id,
                                      to_id= user.id,sender = current_user)
@@ -155,7 +155,7 @@ def home(sort,method,dep):
         return redirect(url_for('home'))
     else:
         task=Task.query.order_by(Task.date_posted.desc())
-        
+
     if dep:
         task=Task.query.filter_by(department=dep)
 
@@ -166,16 +166,16 @@ def home(sort,method,dep):
     elif sort =='Deadline' and method =='asc':
         task = task.order_by(Task.deadline.asc()).paginate(per_page = 3)
     elif sort =='Submits Count' and method == 'asc':
-        task = task.order_by(Task.submits_count.asc()).paginate(per_page = 3)            
+        task = task.order_by(Task.submits_count.asc()).paginate(per_page = 3)
     elif sort == 'Date Posted' and method =='desc':
-        task = task.order_by(Task.date_posted.desc()).paginate(per_page = 3)            
+        task = task.order_by(Task.date_posted.desc()).paginate(per_page = 3)
     elif sort == 'Title' and method =='desc':
         task = task.order_by(Task.title.desc()).paginate(per_page = 3)
     elif sort =='Deadline' and method =='desc':
         task = task.order_by(Task.deadline.desc()).paginate(per_page = 3)
     elif sort =='Submits Count' and method == 'desc':
         task = task.order_by(Task.submits_count.desc()).paginate(per_page = 3)
-    
+
     if request.method =='GET':
         filter_form.sort.data=sort
         filter_form.method.data=method
@@ -183,7 +183,7 @@ def home(sort,method,dep):
 
     return render_template('home.html',tasks =task,Submit = Submit,permissions=permissions,
      due = False,sidebar =True, notifications=notifications,
-     days = days,filter_form =filter_form,form = new_form,location=app.config['TASKS_FILE'],
+     days = days,filter_form =filter_form,form = new_form,location=app.config['TASKS_FILE_DOWNLOAD'],
      len = len,route = 'home',sort=sort,method=method,dep=dep)
 
 @app.route("/register",methods=['GET','POST'])
@@ -195,7 +195,7 @@ def register():
     if form.validate_on_submit():
         if form.department.data=='Select a Department':
             form.department.data='All'
-        subscriber = User(first_name = form.first_name.data.capitalize().strip(), 
+        subscriber = User(first_name = form.first_name.data.capitalize().strip(),
                      last_name = form.last_name.data.capitalize().strip(),
                      username = form.username.data.strip(), email = form.email.data.strip(),
                      password = bcrypt.hashpw(form.password.data.encode('utf-8'),bcrypt.gensalt()),
@@ -213,14 +213,14 @@ def register():
             db.session.commit()
         flash(f'Account created successfully for {form.first_name.data.capitalize()} {form.last_name.data.capitalize()}','success')
         login_user(User.query.filter_by(email= form.email.data).first())
-        return redirect(url_for('home'))   
+        return redirect(url_for('home'))
     return render_template('register.html',title= 'Register',form = form)
-    
+
 @app.route("/login",methods=['GET','POST'])
 def login():
     if current_user.is_authenticated:
         return redirect(url_for('home'))
-        
+
     form = LoginForm()
     if form.validate_on_submit():
         loginer = get_user(form)
@@ -281,7 +281,7 @@ def account():
 
             current_user.first_name = form.first_name.data
             current_user.last_name = form.last_name.data
-            
+
             c = current_user.noti_settings.first()
             c.review =form.noti_review.data
             c.task =form.noti_task.data
@@ -359,7 +359,7 @@ def view_task(department,id,noti):
     excuses = Excuses.query.filter_by(task_id = id)
     excuse= excuses.filter_by(user_id =current_user.id).first()
     missed = Missed.query.filter_by(task_id = id)
-    
+
     if not task:
         abort(404)
     elif new_form.validate_on_submit() and new_form.submit.data:
@@ -369,7 +369,7 @@ def view_task(department,id,noti):
         task.title = new_form.title.data
         task.content= new_form.content.data
         task.deadline = new_form.deadline.data
-        if new_form.file.data is not None : 
+        if new_form.file.data is not None :
             task.file =save_file(new_form.file.data,app.config['TASKS_FILE'])
         db.session.commit()
         flash("Changes have been saved",'success')
@@ -389,7 +389,7 @@ def view_task(department,id,noti):
                 noti = Notifications(type =type, data = text,route = route,data_id = new_submit.id,task=task,
                                      to_id= user.id,sender = current_user)
                 db.session.add(noti)
-    
+
             if user.email_settings.first().submit:
                 recipients.append(user.email)
 
@@ -414,7 +414,7 @@ def view_task(department,id,noti):
                 noti = Notifications(type =type, data = text,route = route,data_id = id,
                                      to_id= user.id,sender = current_user)
                 db.session.add(noti)
-        
+
             if user.email_settings.first().excuse:
                 recipients.append(user.email)
 
@@ -455,12 +455,12 @@ def view_task(department,id,noti):
                 if miss.misser.email_settings.first().missed:
                     recipients.append(miss.misser.email)
 
-            db.session.commit()     
+            db.session.commit()
             mail_sender(recipients=recipients,content='tech',type=type,text=text)
-            
+
     return render_template('task.html',title = task.title,task = task,new_form=new_form,missed = missed,permissions=permissions
         ,submit_form = submit_form,Excuseform = Excuseform,excuses =excuses,excuse= excuse,notifications=noti_fetcher()
-        ,location=app.config['TASKS_FILE'],days = days,submit = submit,submits= submits,
+        ,location=app.config['TASKS_FILE_DOWNLOAD'],days = days,submit = submit,submits= submits,
         len = len,datetime = datetime)
 
 @app.route('/task/<department>/<int:id>/submits/<int:submit_id>-<int:noti>',methods= ['GET','POST'])
@@ -493,7 +493,7 @@ def view_submit(department,id,submit_id,noti):
         return redirect(url_for('submits',task_id = id,department = department))
 
     return render_template('submit.html',submit= submit,days = days,permissions=permissions,
-        location=app.config['SUBMITS_FILE'],task = task,form = form,notifications=noti_fetcher())
+        location=app.config['SUBMITS_FILE_DOWNLOAD'],task = task,form = form,notifications=noti_fetcher())
 
 @app.route('/announcements/<department>/<int:id>-<int:noti>',methods =['POST','GET'])
 @login_required
@@ -563,7 +563,7 @@ def meetups():
 
         type,text,route = noti_text('meetup',name=current_user.last_name,
                 date=days(meetup.date,state='abs'),status=form.state.data)
-        
+
         recipients=[]
         if meetup.department =='All':
             for user in User.query.filter(User.id != current_user.id):
@@ -609,7 +609,7 @@ def meetup(department,id,noti):
         db.session.delete(meetup)
 
         """
-            Child objects can be deleted upon the deletion of their parents IF THERE IS A RELATIONSHIP 
+            Child objects can be deleted upon the deletion of their parents IF THERE IS A RELATIONSHIP
             and cascade option is set to all/delete but in this case, there is no relationship established as
             I still don't know how to generate a dynamic FORIEGN KEYS.
         """
@@ -632,7 +632,7 @@ def meetup(department,id,noti):
         flash("You have been excused",'warning')
         db.session.commit()
         return(redirect(url_for('meetup',department = department,id =id,noti=0)))
-        
+
     return render_template('meetup.html',meetup = meetup,Excuseform = Excuseform,notifications=noti_fetcher(),
         excuses = excuses,confirms =confirms,user_info = user_info,len=len,permissions= permissions)
 
