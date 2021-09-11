@@ -9,7 +9,11 @@ def url_extractor(field):
     extractor = URLExtract()
     urls = extractor.find_urls(field.data)
     for url in urls:
-        field.data =field.data.replace(url,f"<a href='//{url}' target='_blank' rel='noopener noreferrer'>{url}</a>")
+        if ('http' or 'https') in url:
+            html =f"<a href='{url}' target='_blank' rel='noopener noreferrer'>{url}</a>"
+        else:
+            html =f"<a href='//{url}' target='_blank' rel='noopener noreferrer'>{url}</a>"
+        field.data =field.data.replace(url,html)
     return field
 
 def days(date,to_compare = None,state = None):
