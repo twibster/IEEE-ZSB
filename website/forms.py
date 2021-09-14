@@ -53,7 +53,7 @@ class RegistrationForm(FlaskForm):
 	email = StringField("Email",validators = [DataRequired(),Email(),email_validator])
 	birthdate = DateField("Birthdate",format = "%Y-%m-%d",validators = [DataRequired(),age_validator])
 	password = PasswordField('Password',validators = [DataRequired(),upper_lower_validator])
-	confirm_pass = PasswordField("Password Confirmation",validators = [DataRequired(),
+	confirm_pass = PasswordField("Confirm",validators = [DataRequired(),
 								EqualTo('password',message = "Passwords must match")])
 	team_leader = BooleanField('Are you also a Team Leader?')
 	department = SelectField('Department',choices =['Select a Department',"Post-department",'Deep Learning',"PID Control","ROS",

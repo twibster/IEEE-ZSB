@@ -19,6 +19,8 @@
   {% block head %}{% endblock %}
 </head>
 <body>
+{% set department = current_user.department %}
+{% set task_creators =['IEEE Chairman','Vice Technical',"RAS Chairman",'RAS Vice Chairman',"Team Leader"]%}
 {% set logged_in =current_user.is_authenticated %}
     <!-- Nav bar -->
       <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top" >
@@ -93,6 +95,21 @@
                     {% endif %}
                   </a>
                 {% endif %}
+                <div id='nav-elements-mobile' style="padding-right:20px; border-bottom: 1px solid #ccc;border-top: 1px solid #ccc;">
+                  <a class = "nav-item nav-link" href="{{url_for('due',
+                                  department = current_user.department)}}">
+                    {% if current_user.position in task_creators %}
+                      My Tasks
+                    {% else %}
+                      Due Tasks
+                    {% endif %}
+                  </a>
+                  <a class = "nav-item nav-link" href="{{url_for('department',department=current_user.department)}}">
+                      My Department</a>
+                  <a class = "nav-item nav-link" href="{{url_for('meetups')}}">Meet-ups</a>
+                  <a class = "nav-item nav-link" href="{{url_for('announcements',
+                                department = current_user.department,id =0,noti =0)}}">Announcements</a>
+                </div>
                 <a class="nav-item nav-link" href="{{url_for('account')}}">{{current_user.first_name}}'s settings</a>
                 <a class="nav-item nav-link" href="{{url_for('logout')}}">Logout</a>
               {% else%}
@@ -112,10 +129,8 @@
 
     <main role="main" class="container">
       <div class="row">
-        {% set department = current_user.department %}
-        {% set task_creators =['IEEE Chairman','Vice Technical',"RAS Chairman",'RAS Vice Chairman',"Team Leader"]%}
-        {% if sidebar%}
-          <div class="col-md-4">
+        {% if sidebar %}
+          <div class="col-md-4" id ='sidebar'>
             <div class="content-section">
               <h3 style="text-align:center;">Keep Up</h3>
               <p class='text-muted'>
@@ -191,6 +206,32 @@
         });
     }
 });
+</script>
+<script type="text/javascript">
+    sidebar = document.getElementById('sidebar');
+    nav_elements_mobile = document.getElementById('nav-elements-mobile');
+    reg_desktop = document.getElementById('desktop');
+    reg_mobile = document.getElementById('mobile');
+    user_info_div = document.getElementById('reg-user-info-div');
+
+    
+    var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+    if (isMobile) {
+      if (sidebar){
+        sidebar.parentNode.removeChild(sidebar);
+      }
+      else if (reg_desktop){
+        reg_desktop.parentNode.removeChild(reg_desktop);
+        
+      }}
+    else{
+      if (reg_mobile){
+        reg_mobile.parentNode.removeChild(reg_mobile);
+        user_info_div.classList.add("reg-user-info");
+      }
+      nav_elements_mobile.parentNode.removeChild(nav_elements_mobile);
+      }
 </script>
 </body>
 </html>

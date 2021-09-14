@@ -1,0 +1,150 @@
+{% macro user_info(form) %}
+    <div class="col" id='reg-user-info-div'>
+        <legend class="border-bottom mb-4">Join Today</legend>
+        <div class='row'>
+            <div class='col'>
+                <div class="form-group">
+                    {{ form.first_name.label(class="form-control-label") }}<span style="color:#ff0000">*</span>
+                    {% if form.first_name.errors %}
+                        {{ form.first_name(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.first_name.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.first_name(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+            </div>
+            <div class='col'>
+                <div class="form-group">
+                    {{ form.last_name.label(class="form-control-label") }}<span style="color:#ff0000">*</span>
+
+                    {% if form.last_name.errors %}
+                        {{ form.last_name(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.last_name.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.last_name(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            {{ form.username.label(class="form-control-label") }}<span style="color:#ff0000">*</span>
+
+            {% if form.username.errors %}
+                {{ form.username(class="form-control form-control-lg is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in form.username.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% else %}
+                {{ form.username(class="form-control form-control-lg") }}
+            {% endif %}
+        </div>
+        <div class="form-group">
+            {{ form.birthdate.label(class="form-control-label") }}<span style="color:#ff0000">*</span>
+            {% if form.birthdate.errors %}
+                {{ form.birthdate(class="form-control form-control-lg is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in form.birthdate.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% else %}
+                {{ form.birthdate(class="form-control form-control-lg") }}
+            {% endif %}
+        </div>
+        <div class="form-group">
+            {{ form.email.label(class="form-control-label") }}<span style="color:#ff0000">*</span>
+            {% if form.email.errors %}
+                {{ form.email(class="form-control form-control-lg is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in form.email.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% else %}
+                {{ form.email(class="form-control form-control-lg",placeholder="name@example.com") }}
+            {% endif %}
+        </div>
+        <div class='row'>
+            <div class='col'>
+                <div class="form-group">
+                    {{ form.password.label(class="form-control-label") }}<span style="color:#ff0000">*</span>
+                    {% if form.password.errors %}
+                        {{ form.password(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.password.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.password(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+            </div>
+            <div class='col'>
+                <div class="form-group">
+                    {{ form.confirm_pass.label(class="form-control-label") }}<span style="color:#ff0000">*</span>
+
+                    {% if form.confirm_pass.errors %}
+                        {{ form.confirm_pass(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.confirm_pass.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.confirm_pass(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro team_info(form) %}
+<div class='col' style="overflow:hidden">
+    <legend class="border-bottom mb-4">Team Information</legend>
+    <div class="form-group">
+        {{ form.position.label(class="form-control-label") }}<span style="color:#ff0000">*</span>
+
+        {% if form.position.errors %}
+            {{ form.position(class="form-control form-control-lg is-invalid") }}
+            <div class="invalid-feedback">
+                {% for error in form.position.errors %}
+                    <span>{{ error }}</span>
+                {% endfor %}
+            </div>
+        {% else %}
+            {{ form.position(class="form-control form-control-lg",onload='check()') }}
+        {% endif %}
+    </div>
+    <div class="form-check" id='diff_pos' style="display:none;">
+        {{ form.team_leader(class="form-check-input") }}
+        {{ form.team_leader.label(class="form-check-label") }}
+        <br></br>
+    </div>
+    <div class="form-group" id='department_div' style="display:none;">
+        {{form.department.label(class="form-control-label")}}<span style="color:#ff0000">*</span>
+        {% if form.department.errors %}
+            {{ form.department(class="form-control form-control-lg is-invalid") }}
+            <div class="invalid-feedback">
+                {% for error in form.department.errors %}
+                    <span>{{ error }}</span>
+                {% endfor %}
+            </div>
+        {% else %}
+            {{ form.department(class="form-control form-control-lg") }}
+        {% endif %}
+    </div>
+    {{ form.submit(class="btn btn-outline-info btn-float-right") }}
+</div>
+{% endmacro %}
