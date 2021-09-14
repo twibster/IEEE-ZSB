@@ -24,8 +24,9 @@ def noti_clearer(noti):
         db.session.commit()
 
 def noti_fetcher():
-    notifications = Notifications.query.filter_by(to_id = current_user.id).order_by(Notifications.date.desc())
-    return notifications
+    if current_user.is_authenticated:
+        notifications = Notifications.query.filter_by(to_id = current_user.id).order_by(Notifications.date.desc())
+        return notifications
 
 @app.errorhandler(404)
 def not_found(_):
@@ -38,13 +39,9 @@ def no_permission(_):
     return render_template('layout.html',notifications=noti_fetcher())
 
 @app.route("/about",methods= ['GET','POST'])
-@login_required
 def about():
-    if current_user.is_authenticated:
-        notifications=noti_fetcher()
-    else:
-        notifications = None
-    return render_template('about.html',title = 'About',sidebar=True,notifications=notifications)
+    notifications=noti_fetcher()
+    return render_template('about.html',title = 'About',notifications=notifications)
 
 @app.route('/logout')
 def logout():
