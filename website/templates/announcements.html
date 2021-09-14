@@ -125,11 +125,7 @@
 
 <!-- start of Form Validation Error Displayer -->
 {% if form.validation_date.errors %}
-    <script>
-        $(document).ready(function(){
-           $("#newModal").modal();
-        });
-    </script>
+    <script src="/static/scripts/force_modal.js"></script>
 <!-- end of Form Validation Error Displayer -->
 {% endif %}
 {% endblock content %}

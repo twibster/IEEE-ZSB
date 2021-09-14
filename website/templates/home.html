@@ -41,7 +41,7 @@
             {% endif %}
         </div>
         <div class="form-group" style='display: inline-block;'>
-          {{ filter_form.filter(class="btn btn-outline-info ") }}
+          {{ filter_form.filter(class="btn btn-outline-info filter") }}
         </div>
   </form>
 {% endif %}
@@ -193,11 +193,7 @@
 <!-- end of Task Creating Modal-->
 {% if due ==False %}
     {% if form.title.errors%}
-        <script>
-            $(document).ready(function(){
-               $("#newModal").modal();
-            });
-        </script>
+        <script src="/static/scripts/force_modal.js"></script>
     {% endif %}
 {% endif %}
 {% endblock content %}

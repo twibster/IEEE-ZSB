@@ -137,63 +137,9 @@
       </div>
     </main>
     
-<script type="text/javascript">
-  //initialize tooltips
-  $(function () {
-  $('[data-toggle="tooltip"]').tooltip()})
-
-  //initialize popovers
-  $(function () {
-  $('[data-toggle="popover"]').popover()})
-
-  //make popovers disappear on next click outside the popover
-  $("html").on("mouseup", function (e) {
-    var l = $(e.target);
-    if (l[0].className.indexOf("popover") == -1) {
-        $(".popover").each(function () {
-            $(this).popover("hide");
-        });
-    }
-  });
-  //make navbar disappear on next click outside the collapsed content
-  $(function() {
-    $(document).click(function (event) {
-      $('.navbar-collapse').collapse('hide');
-    });
-  });
-
-</script>
-<script type="text/javascript">
-    sidebar = document.getElementById('sidebar');
-    logo = document.getElementById('logo');
-    nav_elements_mobile = document.getElementById('nav-elements-mobile');
-    reg_desktop = document.getElementById('desktop');
-    reg_mobile = document.getElementById('mobile');
-    user_info_div = document.getElementById('reg-user-info-div');
-    notifications_icon_desktop = document.getElementById('notifications-icon-desktop');
-    notifications_icon_mobile = document.getElementById('notifications-icon-mobile');
-
-    
-    var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-
-    if (isMobile) {
-      if (sidebar){
-        sidebar.parentNode.removeChild(sidebar);
-        notifications_icon_desktop.parentNode.removeChild(notifications_icon_desktop); 
-      }
-      else if (reg_desktop){
-        reg_desktop.parentNode.removeChild(reg_desktop); 
-      }
-    }
-    else{
-      if (reg_mobile){
-        reg_mobile.parentNode.removeChild(reg_mobile);
-        user_info_div.classList.add("reg-user-info");
-      }
-      logo.classList.add("navbar-brand-desktop");
-      notifications_icon_mobile.parentNode.removeChild(notifications_icon_mobile);
-      nav_elements_mobile.parentNode.removeChild(nav_elements_mobile);
-      }
-</script>
+  <script type="text/javascript" src="/static/scripts/tooltips.js"></script>
+  <script type="text/javascript" src="/static/scripts/navbar.js"></script>
+  <script type="text/javascript" src="/static/scripts/popovers.js"></script>
+  <script type="text/javascript" src="/static/scripts/view.js"></script>
 </body>
 </html>

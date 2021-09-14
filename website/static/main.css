@@ -12,6 +12,9 @@ h1, h2, h3, h4, h5, h6 {
   background-color: #5f788a;
 }
 
+.filter{
+  margin-bottom: 5px;
+}
 .read-more{
   color: black; font-weight: 600;
 }

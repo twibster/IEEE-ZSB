@@ -27,6 +27,8 @@ def noti_fetcher():
     if current_user.is_authenticated:
         notifications = Notifications.query.filter_by(to_id = current_user.id).order_by(Notifications.date.desc())
         return notifications
+    else:
+        return None
 
 @app.errorhandler(404)
 def not_found(_):
@@ -38,10 +40,9 @@ def no_permission(_):
     flash("You do not have permission to access this page",'danger')
     return render_template('layout.html',notifications=noti_fetcher())
 
-@app.route("/about",methods= ['GET','POST'])
+@app.route("/about")
 def about():
-    notifications=noti_fetcher()
-    return render_template('about.html',title = 'About',notifications=notifications)
+    return render_template('about.html',title = 'About',notifications=noti_fetcher())
 
 @app.route('/logout')
 def logout():
@@ -106,11 +107,6 @@ def submits(department,task_id):
 @app.route("/home/<dep>/<sort>/<method>",methods= ['GET','POST'])
 @login_required
 def home(sort,method,dep):
-    if current_user.is_authenticated:
-        notifications=noti_fetcher()
-    else:
-        notifications = None
-
     filter_form = FilterForm()
     new_form = NewTaskForm()
 
@@ -179,7 +175,7 @@ def home(sort,method,dep):
         filter_form.department.data =dep
 
     return render_template('home.html',tasks =task,Submit = Submit,permissions=permissions,
-     due = False,sidebar =True, notifications=notifications,
+     due = False,sidebar =True, notifications=noti_fetcher(),
      days = days,filter_form =filter_form,form = new_form,location=app.config['TASKS_FILE_DOWNLOAD'],
      len = len,route = 'home',sort=sort,method=method,dep=dep)
 
@@ -263,7 +259,7 @@ def reset_request(state):
 @app.route('/account',methods=['GET','POST'])
 @login_required
 def account():
-    noti_fetcher()
+
     form = AccountForm()
     image_file = url_for('static',filename='profile_pics/' + current_user.image_file)
     if request.method == 'POST':
@@ -344,7 +340,6 @@ def account():
 @app.route('/task/<department>/<int:id>-<int:noti>',methods= ['GET','POST'])
 @login_required
 def view_task(department,id,noti):
-    noti_fetcher()
     noti_clearer(noti)
     submit_form = SubmitTaskForm()
     new_form = NewTaskForm()
@@ -463,7 +458,6 @@ def view_task(department,id,noti):
 @app.route('/task/<department>/<int:id>/submits/<int:submit_id>-<int:noti>',methods= ['GET','POST'])
 @login_required
 def view_submit(department,id,submit_id,noti):
-    noti_fetcher()
     noti_clearer(noti)
     task = Task.query.get(id)
     submit = Submit.query.get(submit_id)
@@ -495,7 +489,6 @@ def view_submit(department,id,submit_id,noti):
 @app.route('/announcements/<department>/<int:id>-<int:noti>',methods =['POST','GET'])
 @login_required
 def announcements(department,id,noti):
-    noti_fetcher()
     noti_clearer(noti)
     form = AnnouncementForm()
 

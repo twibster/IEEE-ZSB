@@ -97,18 +97,7 @@
                                     {{ form.state(class="form-control form-control-lg") }}
                                 {% endif %}
                             </div>
-                            <script type="text/javascript">
-                                let state=document.getElementById('state');
-                                state.onchange = function () {
-                                    type =state.value;
-                                    map_object=document.getElementById('map_object');
-                                    if (type =='Online'){
-                                        map_object.style.display='none'
-                                    }
-                                    else
-                                        map_object.style.display='block'
-                                }
-                            </script>
+                            <script type="text/javascript" src="/static/scripts/new_meetup.js"></script>
                         </div>
                     </div>
                     {% if current_user.position in permissions['announcers'] %}
@@ -173,41 +162,7 @@
                         <label class='form-control-label'>Location</label><span style="color:#ff0000">*</span>
                         <small class='article-department'> ( The coordinates will be filled automatically )</small>
                         <div id ="map" style='height: 400px;width: 100%;'></div><br>
-                        <script>
-                            const labels = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-                            let labelIndex = 0;
-
-                            function initMap() {
-                              const where_am_i = { lat: 30.5765, lng: 31.5041 };
-                              const map = new google.maps.Map(document.getElementById("map"), {
-                                zoom: 12,
-                                center: where_am_i,
-                              });
-
-                              // This event listener calls addMarker() when the map is clicked.
-                              google.maps.event.addListener(map, "click", (event) => {
-                                document.getElementById("lat").value = event.latLng.lat();
-                                document.getElementById("long").value = event.latLng.lng();
-                                addMarker(event.latLng, map);
-                              });
-                            }
-                            
-                            // Adds a marker to the map.
-                            function addMarker(location, map) {
-                              var marker =new google.maps.Marker({
-                                draggable: true,
-                                position: location,
-                                label: labels[labelIndex++ % labels.length],
-                                map: map,
-                              });
-
-                            // this event listener changes the coordinates according to the poisition of the dragged marker.
-                            google.maps.event.addListener(marker, 'dragend', function (event) {
-                                document.getElementById("lat").value = event.latLng.lat();
-                                document.getElementById("long").value = event.latLng.lng();
-                              });
-                            }
-                        </script>
+                        <script type="text/javascript" src="/static/scripts/map.js"></script>
                         <!-- Async script -->
                         <script
                           src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAtSICxgtzM_J7ZkgU6JNkWiMESnhN3PiM&callback=initMap&libraries=&v=weekly"
@@ -252,11 +207,7 @@
 
 <!-- start of Form Validation Error Displayer -->
 {% if form.date.errors or form.long.errors or form.lat.errors %}
-    <script>
-        $(document).ready(function(){
-           $("#newModal").modal();
-        });
-    </script>
+    <script src="/static/scripts/force_modal.js"></script>
 {% endif %}
 <!-- end of Form Validation Error Displayer -->
 
