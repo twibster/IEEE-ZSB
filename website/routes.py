@@ -601,7 +601,7 @@ def meetup(department,id,noti):
         """
             Child objects can be deleted upon the deletion of their parents IF THERE IS A RELATIONSHIP
             and cascade option is set to all/delete but in this case, there is no relationship established as
-            I still don't know how to generate a dynamic FORIEGN KEYS.
+            I still don't know how to generate dynamic FORIEGN KEYS.
         """
         Notifications.query.filter_by(type='meetup',data_id = id).delete(synchronize_session=False)
         ''''''

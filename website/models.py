@@ -20,16 +20,16 @@ class User(db.Model,UserMixin):
     position = db.Column(db.String, nullable = False)
     date_created = db.Column(db.DateTime, nullable = False, default = datetime.utcnow)
     score = db.Column(db.Integer,default=0)
-    tasks = db.relationship('Task', backref = "author")
-    tasks_submitted = db.relationship('Submit',backref = "submitter")
+    tasks = db.relationship('Task', backref = "author", cascade="all, delete")
+    tasks_submitted = db.relationship('Submit',backref = "submitter", cascade="all, delete")
     tasks_missed = db.relationship('Missed',backref = "misser")
-    announcements = db.relationship('Announce',backref = "announcer")
-    meetups = db.relationship('Meetup',backref = "organizer")
-    meetup_case = db.relationship('Meetup_Info',backref = "caser")
+    announcements = db.relationship('Announce',backref = "announcer", cascade="all, delete")
+    meetups = db.relationship('Meetup',backref = "organizer", cascade="all, delete")
+    meetup_case = db.relationship('Meetup_Info',backref = "caser", cascade="all, delete")
     excuses = db.relationship('Excuses',backref = "excuser")
-    notifications = db.relationship('Notifications',backref = "sender")
-    noti_settings = db.relationship('Notifications_Settings',backref = "user",lazy='dynamic')
-    email_settings = db.relationship('Email_Settings',backref = "user",lazy='dynamic')
+    notifications = db.relationship('Notifications',backref = "sender", cascade="all, delete")
+    noti_settings = db.relationship('Notifications_Settings',backref = "user",lazy='dynamic', cascade="all, delete")
+    email_settings = db.relationship('Email_Settings',backref = "user",lazy='dynamic', cascade="all, delete")
 
     def __repr__(self):
         return f"User('{self.username}','{self.email}','{self.image_file}','{self.password}')"
@@ -99,10 +99,10 @@ class Task(db.Model):
     deadline = db.Column(db.DateTime,nullable = False)
     submits_count = db.Column(db.Integer)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    submits = db.relationship('Submit', backref = "task",lazy='dynamic')
-    excuses = db.relationship('Excuses', backref = "task",lazy='dynamic')
-    missed = db.relationship('Missed', backref = "task",lazy='dynamic')
-    noti = db.relationship('Notifications', backref = "task")
+    submits = db.relationship('Submit', backref = "task",lazy='dynamic', cascade="all, delete")
+    excuses = db.relationship('Excuses', backref = "task",lazy='dynamic', cascade="all, delete")
+    missed = db.relationship('Missed', backref = "task",lazy='dynamic', cascade="all, delete")
+    noti = db.relationship('Notifications', backref = "task", cascade="all, delete")
 
     def __repr__(self):
         return f"Task('{self.id}','{self.title}','{self.date_posted}','{self.content}','{self.file}','{self.deadline}','{self.user_id}','{self.submits}')"
@@ -159,7 +159,7 @@ class Meetup(db.Model):
     long=db.Column(db.Integer)
     lat=db.Column(db.Integer)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    info = db.relationship('Meetup_Info',backref = "meetup")
+    info = db.relationship('Meetup_Info',backref = "meetup", cascade="all, delete")
 
 
     def __repr__(self):

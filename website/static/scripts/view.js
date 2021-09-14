@@ -24,6 +24,6 @@ else{
     user_info_div.classList.add("reg-user-info");
   }
   logo.classList.add("navbar-brand-desktop");
-  notifications_icon_mobile.parentNode.removeChild(notifications_icon_mobile);
   nav_elements_mobile.parentNode.removeChild(nav_elements_mobile);
+  notifications_icon_mobile.parentNode.removeChild(notifications_icon_mobile);
   }
