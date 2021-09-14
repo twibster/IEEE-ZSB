@@ -1,3 +1,4 @@
+{% from 'macros.html' import notifications_template %}
 <html>
 <head>
   <!-- Required meta tags -->
@@ -25,12 +26,13 @@
     <!-- Nav bar -->
       <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top" >
         <div class="container">
-          <a class="navbar-brand" href="{{url_for('home')}}">
-            <img src="{{url_for('static',filename='img/logo2.png')}}" alt="">
-          </a>
           <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
           </button>
+          <a class="navbar-brand" href="{{url_for('home')}}">
+            <img src="{{url_for('static',filename='img/logo2.png')}}" alt="" id='logo'>
+          </a>
+          {{ notifications_template(notifications,current_user,'notifications-icon-mobile','navbar-brand',19) }}
           <div class="collapse navbar-collapse" id="navbarToggle">
             <div class="navbar-nav mr-auto">
               <a class="nav-item nav-link" href="{{url_for('home')}}">Home</a>
@@ -39,73 +41,20 @@
             <!-- Navbar Right Side -->
             <div class="navbar-nav">
               {% if logged_in %}
-                {%if notifications %}
-                  <a tabindex="0" class="nav-item nav-link" href='#' data-toggle="popover" title="
-                  <b>Notifications</b>"
-                     data-placement="bottom" data-html="true" data-content="
-                     <div class='list-group'>
-                        {% if notifications.count() > 0 %}
-                         {% for notification in notifications.limit(5) %}
-                           <a style ='margin-left:-5px;'href='
-                           {% if notification.type !='submit'%}
-                             {{url_for(notification.route,department = notification.sender.department,
-                             id = notification.data_id,noti =notification.id)}}
-                           {% else %}
-                             {{url_for(notification.route,department = notification.sender.department,
-                               id = notification.task.id,noti =notification.id,submit_id=notification.data_id)}}
-                            {% endif %}
-                           '
-
-                           class='
-                           {% if notification.clicked == 0 %}
-                              list-group-item list-group-item-action list-group-item-info'
-                           {% else %}
-                              list-group-item list-group-item-action'
-                           {% endif %}
-                            >
-                            <div class='media'>
-                              <img class='rounded-circle noti-img' src='{{url_for('static',filename='profile_pics/'+notification.sender.image_file)}}'>
-                              <div class='media-body'>
-                                {{notification.data}}
-                              </div>
-                            </div>
-                            <div class='article-department'>
-                                <small class='btn-float-right'>{{notification.date.strftime('%d/%m/%Y, %H:%M')}}</small>
-                            </div>
-                           </a>
-                         {% endfor %}
-                        {% else %}
-                          <a class='list-group-item list-group-item-action' style ='margin-left:-5px;' href='#'>
-                            Woah!! No Notifications, Go find a wife.
-                          </a>
-                        {% endif %}
-                      </div>
-                      <div>
-                        <a href='{{url_for('notifications',user_id=current_user.id,mark_as_read=1)}}'>Mark all as read</a>
-                        <a class='btn-float-right' href='{{url_for('notifications',user_id=current_user.id,mark_as_read=0)}}'>View All</a>
-                      </div>
-                        ">
-
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" style='margin-top: 5px;'fill="currentColor" class="bi bi-bell" viewBox="0 0 16 16">
-                      <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2zM8 1.918l-.797.161A4.002 4.002 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4.002 4.002 0 0 0-3.203-3.92L8 1.917zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5.002 5.002 0 0 1 13 6c0 .88.32 4.2 1.22 6z"/>
-                    </svg>
-                    {% set count = notifications.filter_by(clicked=0).count() %}
-                    {% if count != 0%}
-                      <small class="badge badge-danger">{{count}}</small>
-                    {% endif %}
-                  </a>
-                {% endif %}
+                    {{ notifications_template(notifications,current_user,'notifications-icon-desktop','nav-item nav-link',16) }}
                 <div id='nav-elements-mobile' style="padding-right:20px; border-bottom: 1px solid #ccc;border-top: 1px solid #ccc;">
-                  <a class = "nav-item nav-link" href="{{url_for('due',
-                                  department = current_user.department)}}">
-                    {% if current_user.position in task_creators %}
-                      My Tasks
-                    {% else %}
-                      Due Tasks
-                    {% endif %}
-                  </a>
-                  <a class = "nav-item nav-link" href="{{url_for('department',department=current_user.department)}}">
-                      My Department</a>
+                  {% if department != 'All' %}
+                    <a class = "nav-item nav-link" href="{{url_for('due',
+                                    department = current_user.department)}}">
+                      {% if current_user.position in task_creators %}
+                        My Tasks
+                      {% else %}
+                        Due Tasks
+                      {% endif %}
+                    </a>
+                    <a class = "nav-item nav-link" href="{{url_for('department',department=current_user.department)}}">
+                        My Department</a>
+                  {% endif %}
                   <a class = "nav-item nav-link" href="{{url_for('meetups')}}">Meet-ups</a>
                   <a class = "nav-item nav-link" href="{{url_for('announcements',
                                 department = current_user.department,id =0,noti =0)}}">Announcements</a>
@@ -129,39 +78,39 @@
 
     <main role="main" class="container">
       <div class="row">
-        {% if sidebar %}
-          <div class="col-md-4" id ='sidebar'>
-            <div class="content-section">
-              <h3 style="text-align:center;">Keep Up</h3>
-              <p class='text-muted'>
-                <ul class="list-group">
-                  {% if department != 'All' %}
+          {% if sidebar %}
+            <div class="col-md-4" id ='sidebar'>
+              <div class="content-section">
+                <h3 style="text-align:center;">Keep Up</h3>
+                <p class='text-muted'>
+                  <ul class="list-group">
+                    {% if department != 'All' %}
+                      <li class="list-group-item list-group-item-light">
+                        <a class = "article-department" href="{{url_for('due',
+                                    department = current_user.department)}}">
+                          {% if current_user.position in task_creators %}
+                            My Tasks
+                          {% else %}
+                            Due Tasks
+                          {% endif %}
+                        </a>
+                      </li>
+                      <li class="list-group-item list-group-item-light">
+                        <a class = "article-department" href="{{url_for('department',department=current_user.department)}}">
+                        My Department</a>
+                      </li>
+                    {% endif %}
                     <li class="list-group-item list-group-item-light">
-                      <a class = "article-department" href="{{url_for('due',
-                                  department = current_user.department)}}">
-                        {% if current_user.position in task_creators %}
-                          My Tasks
-                        {% else %}
-                          Due Tasks
-                        {% endif %}
-                      </a>
+                      <a class = "article-department" href="{{url_for('meetups')}}">Meet-ups</a>
                     </li>
                     <li class="list-group-item list-group-item-light">
-                      <a class = "article-department" href="{{url_for('department',department=current_user.department)}}">
-                      My Department</a>
+                      <a class = "article-department" href="{{url_for('announcements',
+                                  department = current_user.department,id =0,noti =0)}}">Announcements</a>
                     </li>
-                  {% endif %}
-                  <li class="list-group-item list-group-item-light">
-                    <a class = "article-department" href="{{url_for('meetups')}}">Meet-ups</a>
-                  </li>
-                  <li class="list-group-item list-group-item-light">
-                    <a class = "article-department" href="{{url_for('announcements',
-                                department = current_user.department,id =0,noti =0)}}">Announcements</a>
-                  </li>
-                </ul>
-              </p>
+                  </ul>
+                </p>
+              </div>
             </div>
-          </div>
           {% endif %}
           {% block column %}{% endblock %}
           <div class="col" >
@@ -209,10 +158,13 @@
 </script>
 <script type="text/javascript">
     sidebar = document.getElementById('sidebar');
+    logo = document.getElementById('logo');
     nav_elements_mobile = document.getElementById('nav-elements-mobile');
     reg_desktop = document.getElementById('desktop');
     reg_mobile = document.getElementById('mobile');
     user_info_div = document.getElementById('reg-user-info-div');
+    notifications_icon_desktop = document.getElementById('notifications-icon-desktop');
+    notifications_icon_mobile = document.getElementById('notifications-icon-mobile');
 
     
     var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
@@ -220,16 +172,19 @@
     if (isMobile) {
       if (sidebar){
         sidebar.parentNode.removeChild(sidebar);
+        notifications_icon_desktop.parentNode.removeChild(notifications_icon_desktop); 
       }
       else if (reg_desktop){
-        reg_desktop.parentNode.removeChild(reg_desktop);
-        
-      }}
+        reg_desktop.parentNode.removeChild(reg_desktop); 
+      }
+    }
     else{
       if (reg_mobile){
         reg_mobile.parentNode.removeChild(reg_mobile);
         user_info_div.classList.add("reg-user-info");
       }
+      logo.classList.add("navbar-brand-desktop");
+      notifications_icon_mobile.parentNode.removeChild(notifications_icon_mobile);
       nav_elements_mobile.parentNode.removeChild(nav_elements_mobile);
       }
 </script>

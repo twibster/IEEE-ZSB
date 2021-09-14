@@ -46,12 +46,14 @@ h1, h2, h3, h4, h5, h6 {
     background-size: contain;
 }
 .navbar-brand img{
-  float: left;
-  margin-left: -100px;
   margin-top: -18px;
   margin-bottom: -18px;
   width: 60;
   height: 55;
+}
+.navbar-brand-desktop{
+  float: left;
+  margin-left: -100px;
 }
 .test{
   text-overflow: ellipsis;

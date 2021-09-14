@@ -1,3 +1,57 @@
+{% macro notifications_template(notifications,current_user,id,class,res) %}
+    {% if notifications %}
+        <a tabindex="0" class="{{class}}" href='#' data-toggle="popover" title="<b>Notifications</b>"
+         data-placement="bottom" data-html="true" id='{{id}}' data-content=" 
+            <div class='list-group'>
+            {% if notifications.count() > 0 %}
+             {% for notification in notifications.limit(5) %}
+               <a style ='margin-left:-5px;'href='
+               {% if notification.type !='submit'%}
+                 {{url_for(notification.route,department = notification.sender.department,
+                 id = notification.data_id,noti =notification.id)}}
+               {% else %}
+                 {{url_for(notification.route,department = notification.sender.department,
+                   id = notification.task.id,noti =notification.id,submit_id=notification.data_id)}}
+                {% endif %}
+               '
+               class='
+               {% if notification.clicked == 0 %}
+                  list-group-item list-group-item-action list-group-item-info'
+               {% else %}
+                  list-group-item list-group-item-action'
+               {% endif %}
+                >
+                <div class='media'>
+                  <img class='rounded-circle noti-img' src='{{url_for('static',filename='profile_pics/'+notification.sender.image_file)}}'>
+                  <div class='media-body'>
+                    {{notification.data}}
+                  </div>
+                </div>
+                <div class='article-department'>
+                    <small class='btn-float-right'>{{notification.date.strftime('%d/%m/%Y, %H:%M')}}</small>
+                </div>
+               </a>
+             {% endfor %}
+            {% else %}
+              <a class='list-group-item list-group-item-action' style ='margin-left:-5px;' href='#'>
+                Woah!! No Notifications, Go find a wife.
+              </a>
+            {% endif %}
+          </div>
+          <div>
+            <a href='{{url_for('notifications',user_id=current_user.id,mark_as_read=1)}}'>Mark all as read</a>
+            <a class='btn-float-right' href='{{url_for('notifications',user_id=current_user.id,mark_as_read=0)}}'>View All</a>
+          </div>">
+            <svg xmlns="http://www.w3.org/2000/svg" width="{{res}}" height="{{res}}" style='margin-top: 5px;'fill="currentColor" class="bi bi-bell" viewBox="0 0 16 16">
+                <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2zM8 1.918l-.797.161A4.002 4.002 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4.002 4.002 0 0 0-3.203-3.92L8 1.917zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5.002 5.002 0 0 1 13 6c0 .88.32 4.2 1.22 6z"/>
+            </svg>
+            {% set count = notifications.filter_by(clicked=0).count() %}
+            {% if count != 0%}
+              <small class="badge badge-danger">{{count}}</small>
+            {% endif %}
+        </a>
+    {% endif %}
+{% endmacro %}
 {% macro user_info(form) %}
     <div class="col" id='reg-user-info-div'>
         <legend class="border-bottom mb-4">Join Today</legend>
