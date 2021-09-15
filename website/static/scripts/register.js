@@ -1,3 +1,14 @@
+if (isMobile){
+    reg_desktop = document.getElementById('desktop');
+    reg_desktop.parentNode.removeChild(reg_desktop);
+}
+else{
+    user_info_div = document.getElementById('reg-user-info-div');
+    reg_mobile = document.getElementById('mobile');
+    reg_mobile.parentNode.removeChild(reg_mobile);
+    user_info_div.classList.add("reg-user-info");
+} 
+ 
 document.addEventListener("DOMContentLoaded", function() {
 
     position = document.getElementById('position');
@@ -39,4 +50,4 @@ document.addEventListener("DOMContentLoaded", function() {
     }
     checked.onchange =function(){
         leader();
-}});  
+}});

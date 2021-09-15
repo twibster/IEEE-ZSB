@@ -113,6 +113,27 @@
             </div>
           {% endif %}
           {% block column %}{% endblock %}
+          <script type="text/javascript">
+            sidebar = document.getElementById('sidebar');
+            logo = document.getElementById('logo');
+            nav_elements_mobile = document.getElementById('nav-elements-mobile');
+            notifications_icon_desktop = document.getElementById('notifications-icon-desktop');
+            notifications_icon_mobile = document.getElementById('notifications-icon-mobile');
+
+            var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+            if (isMobile) {
+              if (sidebar){
+                sidebar.parentNode.removeChild(sidebar);
+              }
+              notifications_icon_desktop.parentNode.removeChild(notifications_icon_desktop); 
+            }
+            else{
+              logo.classList.add("navbar-brand-desktop");
+              nav_elements_mobile.parentNode.removeChild(nav_elements_mobile);
+              notifications_icon_mobile.parentNode.removeChild(notifications_icon_mobile);
+              }
+          </script>
           <div class="col" >
             {% with messages = get_flashed_messages(with_categories = True)%}
               {% if messages %}
@@ -136,10 +157,8 @@
           </div>
       </div>
     </main>
-    
   <script type="text/javascript" src="/static/scripts/tooltips.js"></script>
   <script type="text/javascript" src="/static/scripts/navbar.js"></script>
   <script type="text/javascript" src="/static/scripts/popovers.js"></script>
-  <script type="text/javascript" src="/static/scripts/view.js"></script>
 </body>
 </html>
