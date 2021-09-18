@@ -9,9 +9,11 @@ app = Flask(__name__)
 
 def database_url_handler(url):
     ''' this function checks for an outdated postgresql url as it is not supported by sql-alchemy anymore'''
-    if 'postgres://' in url:
-        url.replace("postgres://", "postgresql://", 1)
-
+    if url:
+        if 'postgres://' in url:
+            url=url.replace("postgres://", "postgresql://", 1)
+    else:
+        url='sqlite:///site.db'
     return url
     
 app.config['SQLALCHEMY_DATABASE_URI'] = database_url_handler(os.environ.get('DATABASE_URL'))
