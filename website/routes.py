@@ -538,6 +538,10 @@ def announcements(department,id,noti):
 def meetups():
     form = MeetupForm()
     if form.validate_on_submit():
+        if not(form.lat.data or form.long.data):
+            print('empy')
+            form.lat.data,form.long.data=None,None
+
         form.about = url_extractor(form.about)
         if form.department.data =='Select a department' or not form.department.data:
             form.department.data=current_user.department
@@ -546,8 +550,8 @@ def meetups():
             form.time.data.hour,form.time.data.minute,form.time.data.second)
 
         meetup = Meetup(title = form.title.data,date = date,about = form.about.data,state=form.state.data,
-            organizer = current_user,department = form.department.data,long = form.long.data,
-            lat = form.lat.data)
+            organizer = current_user,department = form.department.data,long = float(form.long.data),
+            lat = float(form.lat.data))
         db.session.add(meetup)
         db.session.commit()
 
