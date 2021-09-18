@@ -36,10 +36,12 @@ pip install -r requirements.txt
   
   ```
     IEEE-ZSB/
+    ├── Procfile
     ├── README.md
     ├── requirements.txt
     ├── reset.py
     ├── run.py
+    ├── wsgi.py
     └── website/
         ├── __init__.py
         ├── email_config.py
@@ -47,7 +49,6 @@ pip install -r requirements.txt
         ├── functions.py
         ├── models.py
         ├── routes.py
-        ├── site.db
         ├── static/
         │   ├── img/
         │   │   ├── favicon.png
@@ -87,6 +88,15 @@ pip install -r requirements.txt
   ```
   
 </details>
+
+## Setup
+There are three environment variables needed for the application to work:
+
+| Syntax | Description | Defualt |
+| ----------- | ----------- | ---------- |
+| *DATABASE_URL* | Url configuration for the database | sqlite:///site.db |
+| *SECRET_KEY* | A long random string | N/A |
+| *GOOGLE_API* | Essential for the maps to work properly | N/A |
 
 ## Usage
 ```bash
