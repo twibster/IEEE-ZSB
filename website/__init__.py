@@ -11,7 +11,8 @@ app = Flask(__name__)
 
 
 
-file_config = {
+app_config = {
+    'SQLALCHEMY_TRACK_MODIFICATIONS':False,
     'TASKS_FILE_DOWNLOAD': os.path.join('media/tasks'),
     'SUBMITS_FILE_DOWNLOAD': os.path.join('media','submits'),
     'TASKS_FILE': os.path.join(app.root_path,'media/tasks'),
@@ -19,7 +20,7 @@ file_config = {
     'PROFILE_PICS':os.path.join(app.root_path,'static/profile_pics')
 }
 
-configuration =environ_config | file_config
+configuration =environ_config | app_config
 app.config.update(configuration)
 
 db = SQLAlchemy(app)
