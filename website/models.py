@@ -8,17 +8,17 @@ def load_user(user_id):
 
 class User(db.Model,UserMixin):
     id = db.Column(db.Integer,primary_key= True)
-    first_name =db.Column(db.String,nullable = False)
-    last_name = db.Column(db.String,nullable = False)
-    username = db.Column(db.String, unique = True, nullable = False)
-    birthdate = db.Column(db.DateTime, nullable = False)
-    age = db.Column(db.Integer,nullable = False)
-    email = db.Column(db.String, unique = True, nullable = False)
-    image_file = db.Column(db.String, nullable = False, default ='default.jpg')
+    first_name =db.Column(db.String)
+    last_name = db.Column(db.String)
+    username = db.Column(db.String, unique = True)
+    birthdate = db.Column(db.DateTime)
+    age = db.Column(db.Integer)
+    email = db.Column(db.String, unique = True)
+    image_file = db.Column(db.String, default ='default.jpg')
     password = db.Column(db.String,nullable = False)
     department = db.Column(db.String)
-    position = db.Column(db.String, nullable = False)
-    date_created = db.Column(db.DateTime, nullable = False, default = datetime.utcnow)
+    position = db.Column(db.String)
+    date_created = db.Column(db.DateTime, default = datetime.utcnow)
     score = db.Column(db.Integer,default=0)
     tasks = db.relationship('Task', backref = "author", cascade="all, delete")
     tasks_submitted = db.relationship('Submit',backref = "submitter", cascade="all, delete")
@@ -33,7 +33,7 @@ class User(db.Model,UserMixin):
 
     def __repr__(self):
         return f"User('{self.username}','{self.email}','{self.image_file}','{self.password}')"
-
+    
 class Notifications(db.Model):
     id = db.Column(db.Integer, primary_key= True)
     date = db.Column(db.DateTime,default=datetime.utcnow)

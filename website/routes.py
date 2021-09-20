@@ -6,7 +6,7 @@ from website.forms import (RegistrationForm,LoginForm,ResetPasswordForm,AccountF
                             FilterForm,AnnouncementForm,MeetupForm,MeetupInfoForm)
 from website.models import (User,Task,Submit,Announce,Meetup,Meetup_Info,Excuses,Missed,
                             Notifications,Notifications_Settings,Email_Settings,Department)
-from website import app,db
+from website import app,db,ModelView,AdminIndexView
 
 from flask_login import login_user,current_user,logout_user,login_required
 from website.functions import days,save_file,noti_text,mail_sender,url_extractor
@@ -213,7 +213,6 @@ def register():
 def login():
     if current_user.is_authenticated:
         return redirect(url_for('home'))
-
     form = LoginForm()
     if form.validate_on_submit():
         loginer = get_user(form)
@@ -221,6 +220,9 @@ def login():
             if bcrypt.checkpw(form.password.data.encode('utf-8'), loginer.password):
                 flash('Login in successfully','success')
                 login_user(loginer,remember =form.remember.data)
+                if loginer.username == app.config['ADMIN_USERNAME']:
+                    return redirect(url_for('admin.index'))
+                    
                 next_page = request.args.get('next')
                 return redirect(next_page) if next_page is not None else redirect(url_for('home'))
             else:
@@ -643,3 +645,24 @@ def notifications(user_id,mark_as_read):
     else:
         abort(403)
     return render_template('notifications.html',notifications_paginated=notifications,notifications=None)
+
+class MyModelView(ModelView):
+    
+    def is_accessible(self):
+        admin = User.query.filter_by(username = app.config['ADMIN_USERNAME']).first()
+        if current_user.is_authenticated:
+            if current_user.username == admin.username and current_user.password == admin.password:
+                return True
+
+    def inaccessible_callback(self,name,**kwargs):
+        return abort(403)
+
+class MyAdminIndexView(AdminIndexView):
+    def is_accessible(self):
+        admin = User.query.filter_by(username = app.config['ADMIN_USERNAME']).first()
+        if current_user.is_authenticated:
+            if current_user.username == admin.username and current_user.password == admin.password:
+                return True
+
+    def inaccessible_callback(self,name,**kwargs):
+        return abort(403)

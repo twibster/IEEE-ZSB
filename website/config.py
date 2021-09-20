@@ -11,6 +11,8 @@ environ_config = {
     'SQLALCHEMY_TRACK_MODIFICATIONS':False,
     'SECRET_KEY': os.environ.get('SECRET_KEY'),
     'GOOGLE_API': os.environ.get('GOOGLE_API'),
+    'ADMIN_USERNAME':os.environ.get('ADMIN_USERNAME'),
+    'FLASK_ADMIN_SWATCH': 'Cerulean'
 }
 defaults={
     "MAIL_SERVER": 'smtp.gmail.com',
