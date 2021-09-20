@@ -15,7 +15,7 @@ class User(db.Model,UserMixin):
     age = db.Column(db.Integer)
     email = db.Column(db.String, unique = True)
     image_file = db.Column(db.String, default ='default.jpg')
-    password = db.Column(db.String,nullable = False)
+    password = db.Column(db.LargeBinary,nullable = False)
     department = db.Column(db.String)
     position = db.Column(db.String)
     date_created = db.Column(db.DateTime, default = datetime.utcnow)
