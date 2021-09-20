@@ -34,7 +34,7 @@ login_manager.login_message = ""
 from website import routes
 from website import models as md
 
-admin = Admin(index_view=routes.MyAdminIndexView(),name='IEEE-ZSB', template_mode='bootstrap3')
+admin = Admin(index_view=routes.MyAdminIndexView(),name='IEEE-ZSB')
 admin.init_app(app)
 admin.add_view(routes.MyModelView(md.User,db.session,category='Users'))
 admin.add_view(routes.MyModelView(md.Notifications,db.session,category='Users'))

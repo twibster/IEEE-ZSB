@@ -10,15 +10,14 @@ environ_config = {
     'SQLALCHEMY_DATABASE_URI': os.environ.get('DATABASE_URL'),
     'SECRET_KEY': os.environ.get('SECRET_KEY'),
     'GOOGLE_API': os.environ.get('GOOGLE_API'),
-    'ADMIN_USERNAME':os.environ.get('ADMIN_USERNAME'),
-    'FLASK_ADMIN_SWATCH': 'Cerulean'
+    'ADMIN_USERNAME':os.environ.get('ADMIN_USERNAME')
 }
 defaults={
     "MAIL_SERVER": 'smtp.gmail.com',
     "MAIL_PORT": 465,
     "MAIL_USE_TLS": False,
     "MAIL_USE_SSL": True,
-    'SECRET_KEY': os.urandom(16),
+    'SECRET_KEY': os.urandom(16).hex(),
     'SQLALCHEMY_DATABASE_URI':'sqlite:///site.db'
 }
 
