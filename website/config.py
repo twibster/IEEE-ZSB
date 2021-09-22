@@ -18,7 +18,8 @@ defaults={
     "MAIL_USE_TLS": False,
     "MAIL_USE_SSL": True,
     'SECRET_KEY': os.urandom(16).hex(),
-    'SQLALCHEMY_DATABASE_URI':'sqlite:///site.db'
+    'SQLALCHEMY_DATABASE_URI':'sqlite:///site.db',
+    'ADMIN_USERNAME':'admin'
 }
 
 for key,value in environ_config.items():

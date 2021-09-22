@@ -1,5 +1,5 @@
 import os,shutil,bcrypt
-from website import db
+from website import db,app
 
 # reinitialize database tables
 def clear_database():
@@ -22,8 +22,19 @@ def add_departments():
 	return 'Departments added successfully'
 
 def add_admin():
-	admin = User(username = os.environ.get('ADMIN_USERNAME'), email = 'admin',department ='All',
-				password = bcrypt.hashpw(os.environ.get('ADMIN_PASSWORD').encode('utf-8'),bcrypt.gensalt()),)
+
+	admin={
+	'username':os.environ.get('ADMIN_USERNAME'),
+	'password':os.environ.get('ADMIN_PASSWORD')
+	}
+
+	for key,value in admin.items():
+		if not value:
+			admin[key] = 'admin'
+
+	admin = User(username = admin['username'], email = 'admin',department ='All',
+				password = bcrypt.hashpw(admin['password'].encode('utf-8'),bcrypt.gensalt()),)
+	
 	db.session.add(admin)
 	db.session.commit()
 	db.session.close()

@@ -90,16 +90,25 @@ pip install -r requirements.txt
 </details>
 
 ## Setup
-There are three environment variables needed for the application to work:
+There are a few environment variables needed for the application to work:
 
-| Syntax | Description | Defualt |
-| ----------- | ----------- | ---------- |
-| *DATABASE_URL* | Url configuration for the database | sqlite:///site.db |
-| *SECRET_KEY* | A long random string | N/A |
-| *GOOGLE_API* | Essential for the maps to work properly | N/A |
+| Syntax | Description | Defualt | Importance |
+| ----------- | ----------- | ---------- | ---------- |
+| *DATABASE_URL* | Url configuration for the database | sqlite:///site.db | High |
+| *SECRET_KEY* | A long random string | A random 16 character long string is generated | High |
+| *GOOGLE_API* | Essential for the maps to work properly | None | Medium |
+| *ADMIN_USERNAME* | The username of the admin page | admin | Medium |
+| *ADMIN_PASSWORD* | The passowrd of the admin page | admin | Medium |
+| *MAIL_SERVER* | The IMAP of the e-mail service | imap.gmail.com | Low |
+| *MAIL_PORT* | The port of the e-mail service | 465 | Low |
+| *MAIL_USE_TLS* | TLS option of the e-mail service | False | Low |
+| *MAIL_USE_SSL* | SSL option of the e-mail service | True | Low |
+| *MAIL_USERNAME* | The email address to send emails from | None | Low |
+| *MAIL_PASSWORD* | The password for the email address | None | Low |
 
 ## Usage
 ```bash
+reset.py    # for the first time only
 python run.py
 ```
 Navigate to your browser and enter **[localhost:5000](localhost:5000)** in the address bar
