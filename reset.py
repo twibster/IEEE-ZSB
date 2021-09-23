@@ -32,7 +32,7 @@ def add_admin():
 		if not value:
 			admin[key] = 'admin'
 
-	admin = User(username = admin['username'], email = 'admin',department =None,
+	admin = User(username = admin['username'], email = 'admin',department ='N/A',
 				password = bcrypt.hashpw(admin['password'].encode('utf-8'),bcrypt.gensalt()),)
 	db.session.add(admin)
 	db.session.commit()
