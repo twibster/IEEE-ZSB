@@ -19,21 +19,23 @@ class User(db.Model,UserMixin):
     department = db.Column(db.String)
     position = db.Column(db.String)
     date_created = db.Column(db.DateTime, default = datetime.utcnow)
+    confirmed = db.Column(db.Boolean,default= False)
     score = db.Column(db.Integer,default=0)
+    notifications = db.relationship('Notifications',backref = "sender", cascade="all, delete")
+    noti_settings = db.relationship('Notifications_Settings',backref = "user",lazy='dynamic', cascade="all, delete")
+    email_settings = db.relationship('Email_Settings',backref = "user",lazy='dynamic', cascade="all, delete")
     tasks = db.relationship('Task', backref = "author", cascade="all, delete")
     tasks_submitted = db.relationship('Submit',backref = "submitter", cascade="all, delete")
     tasks_missed = db.relationship('Missed',backref = "misser")
     announcements = db.relationship('Announce',backref = "announcer", cascade="all, delete")
     meetups = db.relationship('Meetup',backref = "organizer", cascade="all, delete")
     meetup_case = db.relationship('Meetup_Info',backref = "caser", cascade="all, delete")
-    excuses = db.relationship('Excuses',backref = "excuser")
-    notifications = db.relationship('Notifications',backref = "sender", cascade="all, delete")
-    noti_settings = db.relationship('Notifications_Settings',backref = "user",lazy='dynamic', cascade="all, delete")
-    email_settings = db.relationship('Email_Settings',backref = "user",lazy='dynamic', cascade="all, delete")
+    excuses = db.relationship('Excuses',backref = "excuser", cascade="all, delete")
+
 
     def __repr__(self):
         return f"User('{self.username}','{self.email}','{self.image_file}','{self.password}')"
-    
+
 class Notifications(db.Model):
     id = db.Column(db.Integer, primary_key= True)
     date = db.Column(db.DateTime,default=datetime.utcnow)
@@ -48,6 +50,8 @@ class Notifications(db.Model):
 
     def __repr__(self):
         return f"Notifications('{self.id}','{self.type}','{self.data}','{self.data_id}','{self.to_id}','{self.from_id}')"
+
+
 
 class Notifications_Settings(db.Model):
     id = db.Column(db.Integer, primary_key= True)

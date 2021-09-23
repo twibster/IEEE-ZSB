@@ -4,7 +4,6 @@ from flask import render_template
 from threading import Thread
 from urlextract import URLExtract
 
-
 def url_extractor(field):
     extractor = URLExtract()
     urls = extractor.find_urls(field.data)
@@ -42,6 +41,14 @@ def email_data(content='reset',type=None,text=None):
             'title':"Reset Your Password",
             'text':"Use the code below to reset your password. If you didn't request a new password, you can safely delete this email.",
             'footer':"You received this email because we received a request to reset the password of your account. If you didn't request that, you can safely delete this email.",
+            'code':int(''.join(map(str,random.sample(range(0,10),6))))
+        },
+        'confirm':{
+            'subject':'Email Confirmation',
+            'declared':'A confirmation email to validate your account',
+            'title':"Confirm your account",
+            'text':"Use the code below to confirm your account. This code expires 10 minutes from now.",
+            'footer':"You received this email because you signed up in our website. If you didn't do that, you can safely delete this email.",
             'code':int(''.join(map(str,random.sample(range(0,10),6))))
         }
     }

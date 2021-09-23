@@ -1,0 +1,32 @@
+{% extends 'layout.html' %}
+{% block content %}
+<div class='row' style="margin-top:50px;">
+    <div class="center">
+        <div class="content-section" style='text-align: center;'>
+            <form method="POST" action="">
+                {{ form.hidden_tag() }}
+                <fieldset class="form-group">
+                    <legend class="border-bottom mb-4">Activate your account</legend>
+                    <img src="/static/img/email.png" style="width: 100px; height: 100px;"><br></br>
+                    <p>A confirmation code has been sent to your email, <b>enter the code here to activate your account<b></p>
+                    <div class="form-group">
+                        {% if form.code.errors %}
+                            {{ form.code(class="form-control form-control-lg is-invalid",placeholder='Enter 6-digit code') }}
+                            <div class="invalid-feedback">
+                                {% for error in form.code.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.code(class="form-control form-control-lg",placeholder='Enter 6-digit code') }}
+                        {% endif %}
+                    </div>
+                </fieldset>
+                <div class="form-group">
+                    {{ form.submit(class="btn btn-outline-info") }}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,9 +1,10 @@
 import bcrypt,datetime,random
+from functools import wraps
 from bs4 import BeautifulSoup
 from flask import render_template,url_for,flash,redirect,request,send_from_directory,session,abort
 from website.forms import (RegistrationForm,LoginForm,ResetPasswordForm,AccountForm,
                             NewTaskForm,ResetRequestForm,SubmitTaskForm,FeedbackForm,
-                            FilterForm,AnnouncementForm,MeetupForm,MeetupInfoForm)
+                            FilterForm,AnnouncementForm,MeetupForm,MeetupInfoForm,ConfirmForm)
 from website.models import (User,Task,Submit,Announce,Meetup,Meetup_Info,Excuses,Missed,
                             Notifications,Notifications_Settings,Email_Settings,Department)
 from website import app,db,ModelView,AdminIndexView
@@ -17,6 +18,21 @@ permissions={
     'announcers':['IEEE Chairman','Vice Technical',"RAS Chairman",'RAS Vice Chairman']
 }
 
+def confirmation_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not current_user.confirmed:
+            return redirect(url_for('confirm',state= 1))
+        return f(*args, **kwargs)
+    return decorated_function
+
+def logout_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if current_user.is_authenticated:
+            return redirect(url_for('home'))
+        return f(*args, **kwargs)
+    return decorated_function
 
 def noti_clearer(noti):
     if noti != 0:
@@ -51,6 +67,7 @@ def logout():
 
 @app.route('/due/<department>')
 @login_required
+@confirmation_required
 def due(department):
     if current_user.position in permissions['task_creators']:
         tasks = Task.query.filter(Task.author == current_user).order_by(Task.date_posted.desc())
@@ -64,6 +81,7 @@ def due(department):
 
 @app.route('/profile/<username>',methods=['GET','POST'])
 @login_required
+@confirmation_required
 def profile(username):
 
     to_view = User.query.filter_by(username = username).first()
@@ -85,6 +103,7 @@ def get_user(MyForm):
 
 @app.route('/<department>')
 @login_required
+@confirmation_required
 def department(department):
     leaders = User.query.filter(User.department == department,User.position.in_(permissions['task_creators']))
     members = User.query.filter(User.department == department,User.position.in_(permissions['task_submitters']))
@@ -95,6 +114,7 @@ def department(department):
 
 @app.route('/task/<department>/<int:task_id>/submits',methods= ['GET','POST'])
 @login_required
+@confirmation_required
 def submits(department,task_id):
     form = FeedbackForm()
     return render_template('submits.html',days= days,
@@ -106,6 +126,7 @@ def submits(department,task_id):
 @app.route("/home",defaults={'sort':'Date Posted','method':'asc','dep':None},methods= ['GET','POST'])
 @app.route("/home/<dep>/<sort>/<method>",methods= ['GET','POST'])
 @login_required
+@confirmation_required
 def home(sort,method,dep):
     filter_form = FilterForm()
     new_form = NewTaskForm()
@@ -180,10 +201,8 @@ def home(sort,method,dep):
      len = len,route = 'home',sort=sort,method=method,dep=dep)
 
 @app.route("/register",methods=['GET','POST'])
+@logout_required
 def register():
-    if current_user.is_authenticated:
-        return redirect(url_for('home'))
-
     form = RegistrationForm()
     if form.validate_on_submit():
         if form.department.data=='Select a Department':
@@ -210,9 +229,8 @@ def register():
     return render_template('register.html',title= 'Register',form = form)
 
 @app.route("/login",methods=['GET','POST'])
+@logout_required
 def login():
-    if current_user.is_authenticated:
-        return redirect(url_for('home'))
     form = LoginForm()
     if form.validate_on_submit():
         loginer = get_user(form)
@@ -232,10 +250,8 @@ def login():
     return render_template('login.html',title= 'Login',form = form)
 
 @app.route('/reset_request/<int:state>',methods=['GET','POST'])
+@logout_required
 def reset_request(state):
-    if current_user.is_authenticated:
-        return redirect(url_for('home'))
-
     if state ==1:
         form = ResetRequestForm()
         if form.validate_on_submit():
@@ -258,10 +274,30 @@ def reset_request(state):
                 flash('Invalid or expired code','danger')
     return render_template('reset_request.html',title = 'Reset',form = form,state = state)
 
+@app.route('/confirm',methods=['POST','GET'])
+@login_required
+def confirm():
+    if current_user.confirmed:
+        return redirect(url_for('home'))
+    form = ConfirmForm()
+    state = request.args.get('state')
+    if state =='1':
+        session['code'] = mail_sender(recipients=[current_user.email],content='confirm')
+        return redirect(url_for('confirm',state= 0))
+    if form.validate_on_submit():
+        code = session.get('code',None)
+        if int(form.code.data) == int(code):
+            current_user.confirmed = True
+            db.session.commit()
+            flash('Account activated successfully','success')
+            return redirect(url_for('home'))
+        else:
+            flash('Invalid or expired code','danger')
+    return render_template('confirm.html',form =form)
+
 @app.route('/account',methods=['GET','POST'])
 @login_required
 def account():
-
     form = AccountForm()
     image_file = url_for('static',filename='profile_pics/' + current_user.image_file)
     if request.method == 'POST':
@@ -341,6 +377,7 @@ def account():
 
 @app.route('/task/<department>/<int:id>-<int:noti>',methods= ['GET','POST'])
 @login_required
+@confirmation_required
 def view_task(department,id,noti):
     noti_clearer(noti)
     submit_form = SubmitTaskForm()
@@ -459,6 +496,7 @@ def view_task(department,id,noti):
 
 @app.route('/task/<department>/<int:id>/submits/<int:submit_id>-<int:noti>',methods= ['GET','POST'])
 @login_required
+@confirmation_required
 def view_submit(department,id,submit_id,noti):
     noti_clearer(noti)
     task = Task.query.get(id)
@@ -490,6 +528,7 @@ def view_submit(department,id,submit_id,noti):
 
 @app.route('/announcements/<department>/<int:id>-<int:noti>',methods =['POST','GET'])
 @login_required
+@confirmation_required
 def announcements(department,id,noti):
     noti_clearer(noti)
     form = AnnouncementForm()
@@ -537,13 +576,10 @@ def announcements(department,id,noti):
 
 @app.route('/meetups',methods =['POST','GET'])
 @login_required
+@confirmation_required
 def meetups():
     form = MeetupForm()
     if form.validate_on_submit():
-        if not(form.lat.data or form.long.data):
-            print('empy')
-            form.lat.data,form.long.data=None,None
-
         form.about = url_extractor(form.about)
         if form.department.data =='Select a department' or not form.department.data:
             form.department.data=current_user.department
@@ -552,8 +588,8 @@ def meetups():
             form.time.data.hour,form.time.data.minute,form.time.data.second)
 
         meetup = Meetup(title = form.title.data,date = date,about = form.about.data,state=form.state.data,
-            organizer = current_user,department = form.department.data,long = float(form.long.data),
-            lat = float(form.lat.data))
+            organizer = current_user,department = form.department.data,long = form.long.data,
+            lat = form.lat.data)
         db.session.add(meetup)
         db.session.commit()
 
@@ -589,6 +625,7 @@ def meetups():
 
 @app.route('/meetups/<department>/<int:id>-<int:noti>',methods=['POST','GET'])
 @login_required
+@confirmation_required
 def meetup(department,id,noti):
     noti_clearer(noti)
     # queries
@@ -634,6 +671,7 @@ def meetup(department,id,noti):
 
 @app.route('/notifications/<int:user_id>/read?<int:mark_as_read>')
 @login_required
+@confirmation_required
 def notifications(user_id,mark_as_read):
     if user_id == current_user.id:
         if mark_as_read:

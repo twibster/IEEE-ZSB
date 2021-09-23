@@ -115,7 +115,7 @@ class NewTaskForm(FlaskForm):
 	title = StringField("Title",validators = [DataRequired(),Length(max=30)])
 	content = TextAreaField("Content",validators =[DataRequired()])
 	file = FileField("Upload a file")
-	deadline = DateField("Deadline",format = "%Y-%m-%d",validators = [DataRequired(),])
+	deadline = DateField("Deadline",format = "%Y-%m-%d",validators = [DataRequired(),future_validator])
 	submit = SubmitField('Post')
 	
 class SubmitTaskForm(FlaskForm):
@@ -160,4 +160,8 @@ class MeetupForm(FlaskForm):
 class MeetupInfoForm(FlaskForm):
 	notes = TextAreaField('Notes',validators = [Length(max = 1000)])
 	save = SubmitField('Excuse Me!')
+
+class ConfirmForm(FlaskForm):
+	code = StringField("Confirmation Code",validators=[DataRequired(),])
+	submit = SubmitField('Activate my account')
 
