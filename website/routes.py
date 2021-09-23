@@ -277,8 +277,8 @@ def reset_request(state):
 @app.route('/confirm',methods=['POST','GET'])
 @login_required
 def confirm():
-    if current_user.confirmed:
-        return redirect(url_for('home'))
+    if current_user.confirmed or current_user.email =='admin':
+        return redirect(url_for('admin.index')) if current_user.email =='admin' else redirect(url_for('home'))
     form = ConfirmForm()
     state = request.args.get('state')
     if state =='1':
@@ -685,6 +685,9 @@ def notifications(user_id,mark_as_read):
     return render_template('notifications.html',notifications_paginated=notifications,notifications=None)
 
 class MyModelView(ModelView):
+    column_exclude_list = ['password']
+    create_modal = True
+    edit_modal = True
     
     def is_accessible(self):
         admin = User.query.filter_by(username = app.config['ADMIN_USERNAME']).first()
