@@ -2,9 +2,9 @@ const labels = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 let labelIndex = 0;
 
 function initMap() {
-  const where_am_i = { lat: 30.5765, lng: 31.5041 };
+  const where_am_i = { lat: Number(geoplugin_latitude()), lng: Number(geoplugin_longitude()) };
   const map = new google.maps.Map(document.getElementById("map"), {
-    zoom: 12,
+    zoom: 10,
     center: where_am_i,
   });
 
