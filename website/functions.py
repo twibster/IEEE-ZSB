@@ -1,6 +1,6 @@
 import datetime,random,os,secrets
 from website import mail,app,message
-from flask import render_template
+from flask import render_template,url_for,request
 from threading import Thread
 from urlextract import URLExtract
 
@@ -55,6 +55,11 @@ def email_data(content='reset',type=None,text=None):
     return (data[content]['subject'],data[content]['declared'],data[content]['title'],
             data[content]['text'],data[content]['footer'],data[content]['code'])
 
+def get_domain(url):
+    if '.com' in url:
+        url = url[:(url.index('.com'))+4]
+    return url
+    
 def mail_sender(recipients,content='reset',type=None,text=None):
     subject,declared,title,text,footer,code=email_data(content= content,type=type,text=text)
     msg =message(
@@ -62,7 +67,7 @@ def mail_sender(recipients,content='reset',type=None,text=None):
         sender=app.config.get("MAIL_USERNAME"),
         recipients=recipients)
     msg.html=render_template('email_body.html',code =code,declared=declared,title=title,
-                            text = text,footer=footer)
+                            text = text,footer=footer,website=get_domain(url_for(request.endpoint)))
     thr = Thread(target=async_email, args=[app, msg])
     thr.start()
 

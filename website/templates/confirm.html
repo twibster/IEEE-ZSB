@@ -7,7 +7,7 @@
             <fieldset class="form-group">
                 <legend class="border-bottom mb-4">Activate your account</legend>
                 <img src="/static/img/email.png" style="width: 100px; height: 100px;"><br></br>
-                 <p>A confirmation code has been sent to your email, <b>enter the code here to activate your account</b></p>
+                 <p>A confirmation code has been sent to <b>{{current_user.email}}</b>. Enter the code below to activate your account.</p>
                 <a href='#' id='code' style="font-weight:normal;">Resend the confirmation code</a>
                 <div class="form-group">
                     {% if form.code.errors %}

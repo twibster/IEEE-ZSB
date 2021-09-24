@@ -316,7 +316,7 @@ def send_confirmation_code():
         return jsonify(msg='An email has been sent with the confirmation code',
             add='alert alert-success',rem='alert alert-danger')
     else:
-        return jsonify(msg='Spammers are not welcomed, You need to wait atleast 2 minutes',
+        return jsonify(msg='Spammers are not welcomed, You need to wait for at least 2 minutes',
             add='alert alert-danger',rem='alert alert-success')
 
 @app.route('/account',methods=['GET','POST'])
@@ -359,6 +359,7 @@ def account():
                 current_user.username = form.username.data
             if current_user.email != form.email.data:
                 current_user.email = form.email.data
+                current_user.confirmed = False
             if len(form.password.data) >2 :
                 current_user.password= bcrypt.hashpw(form.password.data.encode('utf-8'),bcrypt.gensalt())
             # if current_user.department != form.department.data:
