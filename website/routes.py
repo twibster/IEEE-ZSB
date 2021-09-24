@@ -1,7 +1,7 @@
 import bcrypt,datetime,random
 from functools import wraps
 from bs4 import BeautifulSoup
-from flask import render_template,url_for,flash,redirect,request,send_from_directory,session,abort
+from flask import render_template,url_for,flash,redirect,request,send_from_directory,session,abort,jsonify
 from website.forms import (RegistrationForm,LoginForm,ResetPasswordForm,AccountForm,
                             NewTaskForm,ResetRequestForm,SubmitTaskForm,FeedbackForm,
                             FilterForm,AnnouncementForm,MeetupForm,MeetupInfoForm,ConfirmForm)
@@ -22,7 +22,7 @@ def confirmation_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not current_user.confirmed:
-            return redirect(url_for('confirm',state= 1))
+            return redirect(url_for('confirm'))
         return f(*args, **kwargs)
     return decorated_function
 
@@ -31,6 +31,14 @@ def logout_required(f):
     def decorated_function(*args, **kwargs):
         if current_user.is_authenticated:
             return redirect(url_for('home'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+def confirm_view(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if current_user.confirmed or current_user.email =='admin':
+            return redirect(url_for('admin.index')) if current_user.email =='admin' else redirect(url_for('home'))
         return f(*args, **kwargs)
     return decorated_function
 
@@ -276,14 +284,14 @@ def reset_request(state):
 
 @app.route('/confirm',methods=['POST','GET'])
 @login_required
+@confirm_view
 def confirm():
-    if current_user.confirmed or current_user.email =='admin':
-        return redirect(url_for('admin.index')) if current_user.email =='admin' else redirect(url_for('home'))
     form = ConfirmForm()
-    state = request.args.get('state')
-    if state =='1':
+    if not session.get('code'):
         session['code'] = mail_sender(recipients=[current_user.email],content='confirm')
-        return redirect(url_for('confirm',state= 0))
+        session['time'] = datetime.datetime.utcnow()
+        flash('An email has been sent with the confirmation code','success')
+
     if form.validate_on_submit():
         code = session.get('code',None)
         if int(form.code.data) == int(code):
@@ -293,7 +301,23 @@ def confirm():
             return redirect(url_for('home'))
         else:
             flash('Invalid or expired code','danger')
+
     return render_template('confirm.html',form =form)
+
+
+@app.route('/send_confirmation_code',methods=['POST','GET'])
+@login_required
+@confirm_view
+def send_confirmation_code():
+    elapsed_time = datetime.datetime.utcnow() - session.get('time').replace(tzinfo=None)
+    if elapsed_time.total_seconds() > 120 :
+        session['code'] = mail_sender(recipients=[current_user.email],content='confirm')
+        session['time'] = datetime.datetime.utcnow()
+        return jsonify(msg='An email has been sent with the confirmation code',
+            add='alert alert-success',rem='alert alert-danger')
+    else:
+        return jsonify(msg='Spammers are not welcomed, You need to wait atleast 2 minutes',
+            add='alert alert-danger',rem='alert alert-success')
 
 @app.route('/account',methods=['GET','POST'])
 @login_required
