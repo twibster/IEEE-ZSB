@@ -42,7 +42,7 @@ def get_file(location,filename):
 def livesearch():
     text = request.form.get('text')
     if text != '':
-        departments = dict_generator(Department.query.filter(Department.department.startswith(text)),'department','__d__')
+        departments = dict_generator(Department.query.filter(Department.department.startswith(text.title())),'department','__d__')
         users = dict_generator(User.query.filter(User.username.startswith(text)).limit(3),'username')
         results = users | departments
     else:
@@ -682,9 +682,10 @@ def meetup(department,id,noti):
         excuses = excuses,confirms =confirms,user_info = user_info,len=len,permissions= permissions)
 
 class MyModelView(ModelView):
-    column_exclude_list = ['password']
+    column_exclude_list = ('password')
+    form_excluded_columns = ('password')
     create_modal = True
-    edit_modal = True
+    edit_modal= True
     
     def is_accessible(self):
         admin = User.query.filter_by(username = app.config['ADMIN_USERNAME']).first()

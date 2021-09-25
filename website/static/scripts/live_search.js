@@ -9,10 +9,11 @@ $(document).ready(function(){
           typingTimer = setTimeout(doneTyping, doneTypingInterval);
       }
   });
-  //runs when user is "finished typing,"
+  //run when user is "finished typing,"
   function doneTyping () {
       $('#result').html('')
       text = $('#search').val(); //store the data of the field
+      $('#result').show();
       $.ajax({
         method:'post',
         url:'/livesearch',
