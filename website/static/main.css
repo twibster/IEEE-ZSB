@@ -12,6 +12,23 @@ h1, h2, h3, h4, h5, h6 {
   background-color: #5f788a;
 }
 
+.search{
+  margin-top: 5px;
+  width: inherit;
+}
+.link-class:hover{
+  background-color:#f1f1f1;
+}
+#result {
+ position: absolute;
+ width: 29.2%;
+ max-width:870px;
+ cursor: pointer;
+ overflow-y: auto;
+ max-height: 400px;
+ box-sizing: border-box;
+ z-index: 1001;
+}
 .filter{
   margin-bottom: 5px;
 }
@@ -63,10 +80,6 @@ h1, h2, h3, h4, h5, h6 {
   float: left;
   margin-left: -100px;
 }
-.test{
-  text-overflow: ellipsis;
-  overflow: hidden;
-}
 
 .content-section {
   background: #ffffff;
@@ -95,6 +108,9 @@ a.article-department:hover{
 
 .notification{
   color: black;
+}
+.no-dec:hover{
+  text-decoration: none !important;
 }
 a.notification:hover{
   text-decoration: none

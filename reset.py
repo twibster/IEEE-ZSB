@@ -59,7 +59,7 @@ def clear_profile_pics():
 
 	for pic in os.listdir(profile_pics_path):
 		if pic != 'default.jpg':
-			os.remove(os.path.join(profile_pics,pic))
+			os.remove(os.path.join(profile_pics_path,pic))
 
 	return 'Profile Pictures folder cleared successfully'
 

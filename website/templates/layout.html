@@ -36,6 +36,12 @@
             <div class="navbar-nav mr-auto">
               <a class="nav-item nav-link" href="{{url_for('home')}}">Home</a>
               <a class="nav-item nav-link" href="{{url_for('about')}}">About</a>
+              {% if logged_in and current_user.confirmed%}
+                <div style="width:400px;" id=search-div>
+                  <input class='form-control form-control-sm search' type="text" id='search' placeholder='Search the website'>
+                  <ul class="list-group" id="result"></ul>
+                </div>
+              {% endif %}
             </div>
             <!-- Navbar Right Side -->
             <div class="navbar-nav">
@@ -116,14 +122,22 @@
             nav_elements_mobile = document.getElementById('nav-elements-mobile');
             notifications_icon_desktop = document.getElementById('notifications-icon-desktop');
             notifications_icon_mobile = document.getElementById('notifications-icon-mobile');
+            search = document.getElementById('search-div');
+            result =document.getElementById('result');
 
             var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
             if (isMobile) {
+              if (search){
+                search.style.width ='100%'
+                result.style.width='91%';
+              }
               if (sidebar){
                 sidebar.parentNode.removeChild(sidebar);
               }
-              notifications_icon_desktop.parentNode.removeChild(notifications_icon_desktop); 
+              if (notifications_icon_desktop){
+                notifications_icon_desktop.parentNode.removeChild(notifications_icon_desktop);
+              }
             }
             else{
               logo.classList.add("navbar-brand-desktop");
@@ -157,7 +171,9 @@
           </div>
       </div>
     </main>
+
   <script type="text/javascript" src="/static/scripts/navbar.js"></script>
+  <script type="text/javascript" src="/static/scripts/live_search.js"></script>
   <script type="text/javascript" src="/static/scripts/popovers.js"></script>
 </body>
 </html>

@@ -1,10 +1,77 @@
 import datetime,random,os,secrets
 from website import mail,app,message
+from website.models import Notifications
 from flask import render_template,url_for,request
+from flask_login import current_user
 from threading import Thread
 from urlextract import URLExtract
+from functools import wraps
+
+
+def noti_clearer(noti):
+    '''mark a notification as clicked (seen)'''
+    if noti != 0:
+        Notifications.query.get(noti).clicked = True
+        db.session.commit()
+
+def noti_fetcher():
+    '''return user's notifications if logged in, if not, return nothing'''
+    if current_user.is_authenticated:
+        notifications = Notifications.query.filter_by(to_id = current_user.id).order_by(Notifications.date.desc())
+        return notifications
+    else:
+        return None
+
+## decorators
+def confirmation_required(f):
+    '''check if the user's email is confirmed and if not, send him to the confirmaiton page'''
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not current_user.confirmed:
+            return redirect(url_for('confirm'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+def logout_required(f):
+    '''check if the user is logged out and if not, send him back to the home page'''
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if current_user.is_authenticated:
+            return redirect(url_for('home'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+def confirm_view(f):
+    '''check if the user's email is not confirmed or the user is not the admin'''
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if current_user.confirmed or current_user.email =='admin':
+            return redirect(url_for('admin.index')) if current_user.email =='admin' else redirect(url_for('home'))
+        return f(*args, **kwargs)
+    return decorated_function
+## end of decorators
+
+def row2dict(row):
+    '''this function converts a given row of a query to a dictionary'''
+    allowed =['department','tasks','first_name','last_name','username','position','image_file']
+    dict = {}
+    for column in row.__table__.columns:
+        name = column.name
+        if name in allowed:
+            dict[column.name] = str(getattr(row, column.name))
+    return dict
+
+def dict_generator(query,key,identifier=''):
+    '''this function converts a query into a dictionary'''
+    results={}
+    for row in query:
+        row_as_dict =row2dict(row)
+        if not (row_as_dict['department'] == 'N/A'):
+            results[row_as_dict[key]+identifier]=row_as_dict
+    return results
 
 def url_extractor(field):
+    '''this function extracts urls from given strings and replaces them a link tag'''
     extractor = URLExtract()
     urls = extractor.find_urls(field.data)
     for url in urls:
@@ -16,6 +83,7 @@ def url_extractor(field):
     return field
 
 def days(date,to_compare = None,state = None):
+    '''this function return date in days and if provided compares two dates and returns the time in days'''
     date = datetime.date(date.year,date.month,date.day)
     if to_compare:
         to_compare = datetime.date(to_compare.year,to_compare.month,to_compare.day)
@@ -26,6 +94,7 @@ def days(date,to_compare = None,state = None):
         return abs((today_no_timestamp -date).days) if state =='abs' else (today_no_timestamp -date).days
         
 def email_data(content='reset',type=None,text=None):
+    '''this generates the data for the email body'''
     data={
         'tech':{
             'subject':f'A new {type}',
@@ -56,6 +125,7 @@ def email_data(content='reset',type=None,text=None):
             data[content]['text'],data[content]['footer'],data[content]['code'])
     
 def mail_sender(recipients,content='reset',type=None,text=None):
+    '''this function configures e-mails with varying content and recipients to be sent later'''
     subject,declared,title,text,footer,code=email_data(content= content,type=type,text=text)
     msg =message(
         subject=subject,
@@ -69,6 +139,7 @@ def mail_sender(recipients,content='reset',type=None,text=None):
     return code
 
 def async_email(app,msg):
+    '''this sends the emails provided in sync'''
     with app.app_context():
         try:
             mail.send(msg)
@@ -76,6 +147,7 @@ def async_email(app,msg):
             pass
 
 def save_file(form_file,location):
+    '''saves the provided file in the provived location and if the loction doesn't exisit, creates it'''
     if form_file:
         random_hex = secrets.token_hex(8)
         file_text, file_ext = os.path.splitext(form_file.filename)
@@ -92,6 +164,7 @@ def save_file(form_file,location):
         return None
 
 def noti_text(type,position=None,name=None,task=None,date=None,status=None):
+    '''generates the text of the notifications'''
     data ={
         'Team Member':{
             'task':{'text':f'You have a new task from {name} due {date} days',

@@ -1,6 +1,7 @@
-//make navbar disappear on next click outside the collapsed content
 $(function() {
   $(document).click(function (event) {
-    $('.navbar-collapse').collapse('hide');
+    container=$(".navbar-collapse")
+    if (!container.is(event.target) && !container.has(event.target).length)
+      container.collapse('hide');
   });
 });

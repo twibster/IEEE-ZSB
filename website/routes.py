@@ -1,5 +1,4 @@
 import bcrypt,datetime,random
-from functools import wraps
 from bs4 import BeautifulSoup
 from flask import render_template,url_for,flash,redirect,request,send_from_directory,session,abort,jsonify
 from website.forms import (RegistrationForm,LoginForm,ResetPasswordForm,AccountForm,
@@ -10,49 +9,15 @@ from website.models import (User,Task,Submit,Announce,Meetup,Meetup_Info,Excuses
 from website import app,db,ModelView,AdminIndexView
 
 from flask_login import login_user,current_user,logout_user,login_required
-from website.functions import days,save_file,noti_text,mail_sender,url_extractor
+from website.functions import (days,save_file,noti_text,mail_sender,url_extractor,
+                              dict_generator,confirmation_required,logout_required,
+                              confirm_view,noti_fetcher,noti_clearer)
 
 permissions={
     'task_creators':['IEEE Chairman','Vice Technical',"RAS Chairman",'RAS Vice Chairman',"Team Leader"],
     'task_submitters':["Team Member","Rookie"],
     'announcers':['IEEE Chairman','Vice Technical',"RAS Chairman",'RAS Vice Chairman']
 }
-
-def confirmation_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if not current_user.confirmed:
-            return redirect(url_for('confirm'))
-        return f(*args, **kwargs)
-    return decorated_function
-
-def logout_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if current_user.is_authenticated:
-            return redirect(url_for('home'))
-        return f(*args, **kwargs)
-    return decorated_function
-
-def confirm_view(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if current_user.confirmed or current_user.email =='admin':
-            return redirect(url_for('admin.index')) if current_user.email =='admin' else redirect(url_for('home'))
-        return f(*args, **kwargs)
-    return decorated_function
-
-def noti_clearer(noti):
-    if noti != 0:
-        Notifications.query.get(noti).clicked = True
-        db.session.commit()
-
-def noti_fetcher():
-    if current_user.is_authenticated:
-        notifications = Notifications.query.filter_by(to_id = current_user.id).order_by(Notifications.date.desc())
-        return notifications
-    else:
-        return None
 
 @app.errorhandler(404)
 def not_found(_):
@@ -63,6 +28,41 @@ def not_found(_):
 def no_permission(_):
     flash("You do not have permission to access this page",'danger')
     return render_template('layout.html',notifications=noti_fetcher())
+
+@app.route('/<path:location>/<filename>')
+def get_file(location,filename):
+    try:
+        return send_from_directory(location,filename,as_attachment =False)
+    except FileNotFoundError:
+        abort(404)
+
+@app.route('/livesearch',methods=['POST','GET'])
+@confirmation_required
+@login_required
+def livesearch():
+    text = request.form.get('text')
+    if text != '':
+        departments = dict_generator(Department.query.filter(Department.department.startswith(text)),'department','__d__')
+        users = dict_generator(User.query.filter(User.username.startswith(text)).limit(3),'username')
+        results = users | departments
+    else:
+        results={}
+
+    return jsonify(results)
+
+@app.route('/send_confirmation_code',methods=['POST','GET'])
+@login_required
+@confirm_view
+def send_confirmation_code():
+    elapsed_time = datetime.datetime.utcnow() - session.get('time').replace(tzinfo=None)
+    if elapsed_time.total_seconds() > 120 :
+        session['code'] = mail_sender(recipients=[current_user.email],content='confirm')
+        session['time'] = datetime.datetime.utcnow()
+        return jsonify(msg='An email has been sent with the confirmation code',
+            add='alert alert-success',rem='alert alert-danger')
+    else:
+        return jsonify(msg='Spammers are not welcomed, You need to wait for at least 2 minutes',
+            add='alert alert-danger',rem='alert alert-success')
 
 @app.route("/about")
 def about():
@@ -91,23 +91,24 @@ def due(department):
 @login_required
 @confirmation_required
 def profile(username):
-
     to_view = User.query.filter_by(username = username).first()
     return render_template('profile.html',to_view = to_view,sidebar=True,
         title = ' '.join([to_view.first_name,to_view.last_name]),len = len,notifications=noti_fetcher())
 
-@app.route('/<path:location>/<filename>')
-def get_file(location,filename):
-    try:
-        return send_from_directory(location,filename,as_attachment =False)
-    except FileNotFoundError:
-        abort(404)
-
-def get_user(MyForm):
-    if '@' in MyForm.username_email.data and User.query.filter_by(email = MyForm.username_email.data):
-        return User.query.filter_by(email = MyForm.username_email.data).first()
-    elif User.query.filter_by(username = MyForm.username_email.data).first():
-        return User.query.filter_by(username = MyForm.username_email.data).first()
+@app.route('/notifications/<int:user_id>/read?<int:mark_as_read>')
+@login_required
+@confirmation_required
+def notifications(user_id,mark_as_read):
+    if user_id == current_user.id:
+        if mark_as_read:
+            for noti in Notifications.query.filter_by(to_id =user_id,clicked=False):
+                noti.clicked=True
+            db.session.commit()
+            flash('All unread notifications have been marked as read','success')
+        notifications = Notifications.query.filter_by(to_id =user_id).paginate(per_page=15)
+    else:
+        abort(403)
+    return render_template('notifications.html',notifications_paginated=notifications,notifications=None)
 
 @app.route('/<department>')
 @login_required
@@ -130,6 +131,7 @@ def submits(department,task_id):
         task = Task.query.get(task_id),permissions=permissions,
         submits = Submit.query.filter_by(task_id = task_id).order_by(Submit.date_submitted.desc()).paginate(per_page = 3))
 
+
 @app.route("/",defaults={'sort':'Date Posted','method':'asc','dep':None},methods= ['GET','POST'])
 @app.route("/home",defaults={'sort':'Date Posted','method':'asc','dep':None},methods= ['GET','POST'])
 @app.route("/home/<dep>/<sort>/<method>",methods= ['GET','POST'])
@@ -143,7 +145,6 @@ def home(sort,method,dep):
         dep,sort,method =filter_form.department.data,filter_form.sort.data,filter_form.method.data
 
     elif new_form.validate_on_submit() and new_form.submit.data:
-
         new_form.content = url_extractor(new_form.content)
 
         new_task = Task(author = current_user ,title = new_form.title.data, content= new_form.content.data,
@@ -240,8 +241,9 @@ def register():
 @logout_required
 def login():
     form = LoginForm()
+    creds = form.username_email.data
     if form.validate_on_submit():
-        loginer = get_user(form)
+        loginer = User.query.filter((User.username ==creds) | (User.email==creds)).first()
         if loginer:
             if bcrypt.checkpw(form.password.data.encode('utf-8'), loginer.password):
                 flash('Login in successfully','success')
@@ -303,21 +305,6 @@ def confirm():
             flash('Invalid or expired code','danger')
 
     return render_template('confirm.html',form =form)
-
-
-@app.route('/send_confirmation_code',methods=['POST','GET'])
-@login_required
-@confirm_view
-def send_confirmation_code():
-    elapsed_time = datetime.datetime.utcnow() - session.get('time').replace(tzinfo=None)
-    if elapsed_time.total_seconds() > 120 :
-        session['code'] = mail_sender(recipients=[current_user.email],content='confirm')
-        session['time'] = datetime.datetime.utcnow()
-        return jsonify(msg='An email has been sent with the confirmation code',
-            add='alert alert-success',rem='alert alert-danger')
-    else:
-        return jsonify(msg='Spammers are not welcomed, You need to wait for at least 2 minutes',
-            add='alert alert-danger',rem='alert alert-success')
 
 @app.route('/account',methods=['GET','POST'])
 @login_required
@@ -693,21 +680,6 @@ def meetup(department,id,noti):
 
     return render_template('meetup.html',meetup = meetup,Excuseform = Excuseform,notifications=noti_fetcher(),
         excuses = excuses,confirms =confirms,user_info = user_info,len=len,permissions= permissions)
-
-@app.route('/notifications/<int:user_id>/read?<int:mark_as_read>')
-@login_required
-@confirmation_required
-def notifications(user_id,mark_as_read):
-    if user_id == current_user.id:
-        if mark_as_read:
-            for noti in Notifications.query.filter_by(to_id =user_id,clicked=False):
-                noti.clicked=True
-            db.session.commit()
-            flash('All unread notifications have been marked as read','success')
-        notifications = Notifications.query.filter_by(to_id =user_id).paginate(per_page=15)
-    else:
-        abort(403)
-    return render_template('notifications.html',notifications_paginated=notifications,notifications=None)
 
 class MyModelView(ModelView):
     column_exclude_list = ['password']
