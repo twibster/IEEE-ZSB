@@ -1,7 +1,7 @@
 import datetime,random,os,secrets
 from website import mail,app,message
 from website.models import Notifications
-from flask import render_template,url_for,request
+from flask import render_template,url_for,request,redirect
 from flask_login import current_user
 from threading import Thread
 from urlextract import URLExtract
