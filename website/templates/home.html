@@ -99,9 +99,9 @@
           </div>
         </div>
       </article>
-
-<!-- Pagination -->
 {% endfor %}
+<!-- Pagination -->
+
 {% for page_num in tasks.iter_pages(right_edge = 1,left_edge = 1,left_current = 1,right_current = 2)%}
 {% if page_num %}
   {% if not(tasks.page == 1 and tasks.has_next == False)%}

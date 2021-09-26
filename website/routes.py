@@ -36,6 +36,27 @@ def get_file(location,filename):
     except FileNotFoundError:
         abort(404)
 
+@app.route('/tasks',methods=['GET','POST'])
+def tasks():
+    try:
+        session.pop('last',None)
+    except KeyError:
+        pass
+    return render_template('experimental.html')
+
+@app.route('/get_tasks',methods=['GET','POST'])
+def get_tasks():
+    first,last = session.get('first',None),session.get('last',None)
+    if not last:
+        first,last =0,4
+    tasks_query =Task.query.all()[first:last]
+
+    session['first']=last
+    session['last'] = last + 4
+
+    tasks =dict_generator(tasks_query,'title')
+    return jsonify({'tasks':render_template('task_macro.html',tasks = tasks_query,len=len,days=days)})
+
 @app.route('/livesearch',methods=['POST','GET'])
 @confirmation_required
 @login_required
@@ -88,6 +109,8 @@ def due(department):
 @confirmation_required
 def profile(username):
     to_view = User.query.filter_by(username = username).first()
+    if not to_view:
+        abort(404)
     return render_template('profile.html',to_view = to_view,sidebar=True,
         title = ' '.join([to_view.first_name,to_view.last_name]),len = len,notifications=noti_fetcher())
 

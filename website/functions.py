@@ -53,12 +53,20 @@ def confirm_view(f):
 
 def row2dict(row):
     '''this function converts a given row of a query to a dictionary'''
-    allowed =['department','tasks','first_name','last_name','username','position','image_file']
+    allowed =['department','tasks','first_name','last_name','username','position',
+            'image_file','title','deadline','file','date_posted','content','user_id','id']
     dict = {}
     for column in row.__table__.columns:
         name = column.name
         if name in allowed:
             dict[column.name] = str(getattr(row, column.name))
+            if name =='date_posted' or name == 'date_created':
+                dict[name]= getattr(row, column.name).strftime("%d/%m/%Y, %H:%M")
+            elif name =='deadline':
+                dict[name]= f"due {days(getattr(row, column.name),state='abs')} days"
+
+        if name =='user_id':
+            dict.update(row2dict(row.author))
     return dict
 
 def dict_generator(query,key,identifier=''):
