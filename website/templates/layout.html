@@ -35,7 +35,7 @@
           <div class="collapse navbar-collapse" id="navbarToggle">
             <div class="navbar-nav mr-auto">
               <a class="nav-item nav-link" href="{{url_for('home')}}">Home</a>
-              <a class="nav-item nav-link" href="{{url_for('about')}}">About</a>
+              <a class="nav-item nav-link" href='https://ieee-zsb.org'>About</a>
               {% if logged_in and current_user.confirmed%}
                 <div style="width:400px;" id=search-div>
                   <input class='form-control form-control-sm search' type="text" id='search' placeholder='Search the website'>
@@ -47,7 +47,7 @@
             <div class="navbar-nav">
               {% if logged_in %}
                     {{ notifications_template(notifications,current_user,'notifications-icon-desktop','nav-item nav-link',16) }}
-                <div id='nav-elements-mobile' style="padding-right:20px; border-bottom: 1px solid #ccc;border-top: 1px solid #ccc;">
+                <div class='nav-bar-mobile-div' id='nav-elements-mobile'>
                   {% if department != 'All' %}
                     <a class = "nav-item nav-link" href="{{url_for('due',
                                     department = current_user.department)}}">
@@ -64,13 +64,23 @@
                   <a class = "nav-item nav-link" href="{{url_for('announcements',
                                 department = current_user.department,id =0,noti =0)}}">Announcements</a>
                 </div>
-                <a class="nav-item nav-link" href="{{url_for('account')}}">{{current_user.first_name}}'s settings</a>
-                <a class="nav-item nav-link" href="{{url_for('logout')}}">Logout</a>
+                <div class="dropdown">
+                  <button class="dropdown-button nav-item nav-link dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Account
+                  </button>
+                  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <a class="dropdown-item" href="{{url_for('profile',username = current_user.username)}}">Profile</a>
+                    <a class="dropdown-item" href="{{url_for('account')}}">Settings</a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="{{url_for('logout')}}">Logout</a>
+                  </div>
+                </div>
               {% else%}
                 <a class="nav-item nav-link" href="{{url_for('login')}}">Login</a>
                 <a class="nav-item nav-link" href="{{url_for('register')}}">Register</a>
               {% endif%}
             </div>
+            <!-- end of navbar right side -->
           </div>
         </div>
       </nav>
@@ -82,6 +92,7 @@
     <main role="main" class="container">
       <div class="row">
           {% if sidebar %}
+          <!-- start of side bar -->
             <div class="col-md-4" id ='sidebar'>
               <div class="content-section">
                 <h3 style="text-align:center;">Keep Up</h3>
@@ -114,6 +125,7 @@
                 </p>
               </div>
             </div>
+          <!-- end of side bar -->
           {% endif %}
           {% block column %}{% endblock %}
           <script type="text/javascript">
@@ -137,12 +149,16 @@
               }
             }
             else{
-              result.style.width = search.offsetWidth;
+              if (result){
+                result.style.width = search.offsetWidth;
+                search.style.marginLeft = "20px";
+              }
               logo.classList.add("navbar-brand-desktop");
               nav_elements_mobile.parentNode.removeChild(nav_elements_mobile);
               notifications_icon_mobile.parentNode.removeChild(notifications_icon_mobile);
               }
           </script>
+          <!-- start of flashed messages -->
           <div class="col">
             <div class = 'alert alert-{{catagory}}' id='msg-category' style='display: none;'>
               <p style="padding: 15px;" id='msg-content'></p>
@@ -165,7 +181,10 @@
                 {% endfor %}
               {% endif %}
             {% endwith%}
+          <!-- end of flashed messages-->
+          <!-- start of content -->
             {% block content %}{% endblock %}
+          <!-- end of content -->
           </div>
       </div>
     </main>

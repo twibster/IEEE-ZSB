@@ -64,10 +64,6 @@ def send_confirmation_code():
         return jsonify(msg='Spammers are not welcomed, You need to wait for at least 2 minutes',
             add='alert alert-danger',rem='alert alert-success')
 
-@app.route("/about")
-def about():
-    return render_template('about.html',title = 'About',notifications=noti_fetcher())
-
 @app.route('/logout')
 def logout():
     logout_user()
