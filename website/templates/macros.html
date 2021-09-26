@@ -55,112 +55,39 @@
 {% macro user_info(form) %}
     <div class="col" id='reg-user-info-div'>
         <legend class="border-bottom mb-4">Join Today</legend>
-        <div class='row'>
-            <div class='col'>
-                <div class="form-group">
-                    {{ form.first_name.label(class="form-control-label") }}<span style="color:#ff0000">*</span>
-                    {% if form.first_name.errors %}
-                        {{ form.first_name(class="form-control form-control-lg is-invalid") }}
-                        <div class="invalid-feedback">
-                            {% for error in form.first_name.errors %}
-                                <span>{{ error }}</span>
-                            {% endfor %}
+        {% for field in form %}
+            {% if field.type =='StringField' or field.type=='DateField' or field.type=='PasswordField'%}
+                {% if field.id =='first_name' or field.id=='password'%}
+                    <div class='row'>
+                        <div class='col'>
+                {% elif field.id== 'last_name' or field.id=='confirm_pass'%}
+                        <div class='col'>
+                {% endif %}
+                            <div class="form-group">
+                                {{field.label(class = 'form-control-label')}}<span style="color:#ff0000">*</span>
+                                {% if field.errors %}
+                                    {{ field(class="form-control form-control-lg is-invalid") }}
+                                    <div class="invalid-feedback">
+                                        {% for error in field.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    {% if field.label=='Email'%}
+                                        {{ field(class="form-control form-control-lg",placeholder="name@example.com") }}
+                                    {% else %}
+                                        {{ field(class="form-control form-control-lg") }}
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                {% if field.id =='first_name' or field.id =='password' %}
                         </div>
-                    {% else %}
-                        {{ form.first_name(class="form-control form-control-lg") }}
-                    {% endif %}
-                </div>
-            </div>
-            <div class='col'>
-                <div class="form-group">
-                    {{ form.last_name.label(class="form-control-label") }}<span style="color:#ff0000">*</span>
-
-                    {% if form.last_name.errors %}
-                        {{ form.last_name(class="form-control form-control-lg is-invalid") }}
-                        <div class="invalid-feedback">
-                            {% for error in form.last_name.errors %}
-                                <span>{{ error }}</span>
-                            {% endfor %}
+                {% elif field.id =='last_name' or field.id =='confirm_pass' %}
                         </div>
-                    {% else %}
-                        {{ form.last_name(class="form-control form-control-lg") }}
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-        <div class="form-group">
-            {{ form.username.label(class="form-control-label") }}<span style="color:#ff0000">*</span>
-
-            {% if form.username.errors %}
-                {{ form.username(class="form-control form-control-lg is-invalid") }}
-                <div class="invalid-feedback">
-                    {% for error in form.username.errors %}
-                        <span>{{ error }}</span>
-                    {% endfor %}
-                </div>
-            {% else %}
-                {{ form.username(class="form-control form-control-lg") }}
+                    </div>
+                {% endif %}
             {% endif %}
-        </div>
-        <div class="form-group">
-            {{ form.birthdate.label(class="form-control-label") }}<span style="color:#ff0000">*</span>
-            {% if form.birthdate.errors %}
-                {{ form.birthdate(class="form-control form-control-lg is-invalid") }}
-                <div class="invalid-feedback">
-                    {% for error in form.birthdate.errors %}
-                        <span>{{ error }}</span>
-                    {% endfor %}
-                </div>
-            {% else %}
-                {{ form.birthdate(class="form-control form-control-lg") }}
-            {% endif %}
-        </div>
-        <div class="form-group">
-            {{ form.email.label(class="form-control-label") }}<span style="color:#ff0000">*</span>
-            {% if form.email.errors %}
-                {{ form.email(class="form-control form-control-lg is-invalid") }}
-                <div class="invalid-feedback">
-                    {% for error in form.email.errors %}
-                        <span>{{ error }}</span>
-                    {% endfor %}
-                </div>
-            {% else %}
-                {{ form.email(class="form-control form-control-lg",placeholder="name@example.com") }}
-            {% endif %}
-        </div>
-        <div class='row'>
-            <div class='col'>
-                <div class="form-group">
-                    {{ form.password.label(class="form-control-label") }}<span style="color:#ff0000">*</span>
-                    {% if form.password.errors %}
-                        {{ form.password(class="form-control form-control-lg is-invalid") }}
-                        <div class="invalid-feedback">
-                            {% for error in form.password.errors %}
-                                <span>{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        {{ form.password(class="form-control form-control-lg") }}
-                    {% endif %}
-                </div>
-            </div>
-            <div class='col'>
-                <div class="form-group">
-                    {{ form.confirm_pass.label(class="form-control-label") }}<span style="color:#ff0000">*</span>
-
-                    {% if form.confirm_pass.errors %}
-                        {{ form.confirm_pass(class="form-control form-control-lg is-invalid") }}
-                        <div class="invalid-feedback">
-                            {% for error in form.confirm_pass.errors %}
-                                <span>{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        {{ form.confirm_pass(class="form-control form-control-lg") }}
-                    {% endif %}
-                </div>
-            </div>
-        </div>
+        {% endfor %}
     </div>
 {% endmacro %}
 

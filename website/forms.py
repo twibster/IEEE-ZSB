@@ -47,11 +47,11 @@ def reset_exists(self,field):
 class RegistrationForm(FlaskForm):
 	first_name = StringField('First Name',validators = [DataRequired(),Length(min = 3)])
 	last_name = StringField('Last Name',validators = [DataRequired(),Length(min = 3)])
+	birthdate = DateField("Birthdate",format = "%Y-%m-%d",validators = [DataRequired(),age_validator])
 	username = StringField('Username',validators = [DataRequired(),username_validator,
 							space_validator,Length(min = 5,max =20)])
 
 	email = StringField("Email",validators = [DataRequired(),Email(),email_validator])
-	birthdate = DateField("Birthdate",format = "%Y-%m-%d",validators = [DataRequired(),age_validator])
 	password = PasswordField('Password',validators = [DataRequired(),upper_lower_validator])
 	confirm_pass = PasswordField("Confirm",validators = [DataRequired(),
 								EqualTo('password',message = "Passwords must match")])

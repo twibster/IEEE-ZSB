@@ -8,43 +8,36 @@
                     {{ form.hidden_tag() }}
                     <fieldset class="form-group">
                         <legend class="border-bottom mb-4">Welcome Back</legend>
-                        <div class="form-group">
-                            {{ form.username_email.label(class="form-control-label") }}
-                            {% if form.username_email.errors %}
-                                {{ form.username_email(class="form-control form-control-lg is-invalid") }}
-                                <div class="invalid-feedback">
-                                    {% for error in form.username_email.errors %}
-                                        <span>{{ error }}</span>
-                                    {% endfor %}
+                        {% for field in form %}
+                            {% if field.type =='StringField' or field.type=='PasswordField'%}
+                                <div class="form-group">
+                                    {{field.label(class = 'form-control-label')}}
+                                    {% if field.errors %}
+                                        {{ field(class="form-control form-control-lg is-invalid") }}
+                                        <div class="invalid-feedback">
+                                            {% for error in field.errors %}
+                                                <span>{{ error }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        {{ field(class="form-control form-control-lg") }}
+                                    {% endif %}
                                 </div>
-                            {% else %}
-                                {{ form.username_email(class="form-control form-control-lg") }}
-                            {% endif %}
-                        </div>
-                        <div class="form-group">
-                            {{ form.password.label(class="form-control-label") }}
-                            {% if form.password.errors %}
-                                {{ form.password(class="form-control form-control-lg is-invalid") }}
-                                <div class="invalid-feedback">
-                                    {% for error in form.password.errors %}
-                                        <span>{{ error }}</span>
-                                    {% endfor %}
+                            {% elif field.type =='BooleanField' %}
+                                <div class="form-check">
+                                    {{ field(class="form-check-input") }}
+                                    {{ field.label(class="form-check-label") }}
                                 </div>
-                            {% else %}
-                                {{ form.password(class="form-control form-control-lg") }}
+                            {% elif field.type =='SubmitField' %}
+                            </fieldset>
+                                <div class='form-group'>
+                                    {{ form.submit(class="btn btn-outline-info") }}
+                                    <small class="text-muted ml-2">
+                                        <a href="{{ url_for('reset_request',state =1) }}">Forgot Password?</a>
+                                    </small>
+                                </div>
                             {% endif %}
-                        </div>
-                        <div class="form-check">
-                            {{ form.remember(class="form-check-input") }}
-                            {{ form.remember.label(class="form-check-label") }}
-                        </div>
-                    </fieldset>
-                    <div class="form-group">
-                        {{ form.submit(class="btn btn-outline-info") }}
-                        <small class="text-muted ml-2">
-                            <a href="{{ url_for('reset_request',state =1) }}">Forgot Password?</a>
-                        </small>
-                    </div>
+                        {% endfor %}
                 </form>
             </div>
             <div class="border-top pt-3">
