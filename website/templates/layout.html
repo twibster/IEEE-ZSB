@@ -37,7 +37,7 @@
               <a class="nav-item nav-link" href="{{url_for('home')}}">Home</a>
               <a class="nav-item nav-link" href='https://ieee-zsb.org'>About</a>
               {% if logged_in and current_user.confirmed%}
-                <div style="width:400px;" id=search-div>
+                <div  id='search-div'>
                   <input class='form-control form-control-sm search' type="text" id='search' placeholder='Search the website'>
                   <ul class="list-group" id="result"></ul>
                 </div>
@@ -149,9 +149,9 @@
               }
             }
             else{
-              if (result){
+              if (search_div){
                 result.style.width = search.offsetWidth;
-                search.style.marginLeft = "20px";
+                search_div.style.marginLeft = "20px";
               }
               logo.classList.add("navbar-brand-desktop");
               nav_elements_mobile.parentNode.removeChild(nav_elements_mobile);

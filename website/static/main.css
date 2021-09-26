@@ -16,6 +16,7 @@ h1, h2, h3, h4, h5, h6 {
   margin-top: 5px;
   width: inherit;
 }
+
 .link-class:hover{
   background-color:#f1f1f1;
 }
@@ -23,6 +24,11 @@ h1, h2, h3, h4, h5, h6 {
   width: 100px;
   height: 100px;
 }
+
+#search-div{
+  width:400px;
+}
+
 #result {
  position: absolute;
  max-width:870px;
