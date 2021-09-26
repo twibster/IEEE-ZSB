@@ -44,7 +44,7 @@
       <h2 class="article-title" >{{ meetup.title }}
         <small class="text-muted">{{ meetup.department }}<small style='font-size: 12px'>({{meetup.state}})</small></small>
       </h2>
-      <p class="article-content"> {{meetup.about|safe}}</p>
+      <p class="article-content"> {{url_extractor(meetup.about)|safe}}</p>
       <small class="mr-2"><b>Date: </b>{{meetup.date.strftime("%d/%m/%Y, %H:%M")}}</small><br></br>
       {% if meetup.state=='Offline' %}
         <legend class="border-bottom mb-4" style="text-align:center;"><b>location</b></legend>

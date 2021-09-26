@@ -1,5 +1,4 @@
 import bcrypt,datetime,random
-from bs4 import BeautifulSoup
 from flask import render_template,url_for,flash,redirect,request,send_from_directory,session,abort,jsonify
 from website.forms import (RegistrationForm,LoginForm,ResetPasswordForm,AccountForm,
                             NewTaskForm,ResetRequestForm,SubmitTaskForm,FeedbackForm,
@@ -55,7 +54,7 @@ def get_tasks():
     tasks_query =Task.query.all()[first:last]
     session['first']=last
     session['last'] = last + 4
-    return jsonify({'tasks':render_template('task_macro.html',tasks = tasks_query,len=len,days=days)})
+    return jsonify({'tasks':render_template('task_macro.html',tasks = tasks_query,len=len,days=days,url_extractor=url_extractor)})
 
 @app.route('/livesearch',methods=['POST','GET'])
 @confirmation_required
@@ -147,7 +146,7 @@ def submits(department,task_id):
     form = FeedbackForm()
     return render_template('submits.html',days= days,
         location = app.config['SUBMITS_FILE_DOWNLOAD'],notifications=noti_fetcher(),
-        task = Task.query.get(task_id),permissions=permissions,
+        task = Task.query.get(task_id),permissions=permissions,url_extractor=url_extractor,
         submits = Submit.query.filter_by(task_id = task_id).order_by(Submit.date_submitted.desc()).paginate(per_page = 3))
 
 
@@ -164,7 +163,6 @@ def home(sort,method,dep):
         dep,sort,method =filter_form.department.data,filter_form.sort.data,filter_form.method.data
 
     elif new_form.validate_on_submit() and new_form.submit.data:
-        new_form.content = url_extractor(new_form.content)
 
         new_task = Task(author = current_user ,title = new_form.title.data, content= new_form.content.data,
             deadline = new_form.deadline.data,file = save_file(new_form.file.data,app.config['TASKS_FILE']),
@@ -226,7 +224,7 @@ def home(sort,method,dep):
     return render_template('home.html',tasks =task,Submit = Submit,permissions=permissions,
      due = False,sidebar =True, notifications=noti_fetcher(),
      days = days,filter_form =filter_form,form = new_form,location=app.config['TASKS_FILE_DOWNLOAD'],
-     len = len,route = 'home',sort=sort,method=method,dep=dep)
+     len = len,route = 'home',sort=sort,method=method,dep=dep,url_extractor=url_extractor)
 
 @app.route("/register",methods=['GET','POST'])
 @logout_required
@@ -426,8 +424,6 @@ def view_task(department,id,noti):
         abort(404)
     elif new_form.validate_on_submit() and new_form.submit.data:
 
-        new_form.content = url_extractor(new_form.content)
-
         task.title = new_form.title.data
         task.content= new_form.content.data
         task.deadline = new_form.deadline.data
@@ -492,9 +488,8 @@ def view_task(department,id,noti):
         return(redirect(url_for('view_task',department = department,id =id,noti=0)))
 
     elif request.method == 'GET':
-        content = BeautifulSoup(task.content,features="html.parser")
         new_form.title.data = task.title
-        new_form.content.data =content.get_text()
+        new_form.content.data =task.content
         new_form.file.data = task.file
         new_form.deadline.data = task.deadline
 
@@ -522,7 +517,7 @@ def view_task(department,id,noti):
 
     return render_template('task.html',title = task.title,task = task,new_form=new_form,missed = missed,permissions=permissions
         ,submit_form = submit_form,Excuseform = Excuseform,excuses =excuses,excuse= excuse,notifications=noti_fetcher()
-        ,location=app.config['TASKS_FILE_DOWNLOAD'],days = days,submit = submit,submits= submits,
+        ,location=app.config['TASKS_FILE_DOWNLOAD'],days = days,submit = submit,submits= submits,url_extractor=url_extractor,
         len = len,datetime = datetime)
 
 @app.route('/task/<department>/<int:id>/submits/<int:submit_id>-<int:noti>',methods= ['GET','POST'])
@@ -554,7 +549,7 @@ def view_submit(department,id,submit_id,noti):
         flash('Your feedback has been delivered','success')
         return redirect(url_for('submits',task_id = id,department = department))
 
-    return render_template('submit.html',submit= submit,days = days,permissions=permissions,
+    return render_template('submit.html',submit= submit,days = days,permissions=permissions,url_extractor=url_extractor,
         location=app.config['SUBMITS_FILE_DOWNLOAD'],task = task,form = form,notifications=noti_fetcher())
 
 @app.route('/announcements/<department>/<int:id>-<int:noti>',methods =['POST','GET'])
@@ -565,7 +560,6 @@ def announcements(department,id,noti):
     form = AnnouncementForm()
 
     if form.validate_on_submit():
-        form.content = url_extractor(form.content)
         if form.department.data =='Select a department' or not form.department.data:
             form.department.data=current_user.department
 
@@ -602,7 +596,7 @@ def announcements(department,id,noti):
             db.session.delete(Announce.query.get(id))
             db.session.commit()
 
-    return render_template('announcements.html',form =form,sidebar=True,notifications=noti_fetcher(),permissions=permissions,
+    return render_template('announcements.html',form =form,url_extractor=url_extractor,sidebar=True,notifications=noti_fetcher(),permissions=permissions,
         announcements = Announce.query.order_by(Announce.date_announced.desc()).paginate(per_page = 5))
 
 @app.route('/meetups',methods =['POST','GET'])
@@ -611,7 +605,6 @@ def announcements(department,id,noti):
 def meetups():
     form = MeetupForm()
     if form.validate_on_submit():
-        form.about = url_extractor(form.about)
         if form.department.data =='Select a department' or not form.department.data:
             form.department.data=current_user.department
 
@@ -651,7 +644,7 @@ def meetups():
         mail_sender(recipients=recipients,content='tech',type=type,text=text)
         db.session.commit()
         flash('Meet-up created successfully','success')
-    return render_template('meet-ups.html',form =form,sidebar= True,notifications=noti_fetcher(),permissions=permissions,
+    return render_template('meet-ups.html',form =form,sidebar= True,url_extractor=url_extractor,notifications=noti_fetcher(),permissions=permissions,
         meetups = Meetup.query.order_by(Meetup.date_created.desc()).paginate(per_page = 5))
 
 @app.route('/meetups/<department>/<int:id>-<int:noti>',methods=['POST','GET'])
@@ -697,7 +690,7 @@ def meetup(department,id,noti):
         db.session.commit()
         return(redirect(url_for('meetup',department = department,id =id,noti=0)))
 
-    return render_template('meetup.html',meetup = meetup,Excuseform = Excuseform,notifications=noti_fetcher(),
+    return render_template('meetup.html',meetup = meetup,Excuseform = Excuseform,url_extractor=url_extractor,notifications=noti_fetcher(),
         excuses = excuses,confirms =confirms,user_info = user_info,len=len,permissions= permissions)
 
 class MyModelView(ModelView):

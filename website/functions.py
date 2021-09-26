@@ -78,17 +78,17 @@ def dict_generator(query,key,identifier=''):
             results[row_as_dict[key]+identifier]=row_as_dict
     return results
 
-def url_extractor(field):
+def url_extractor(data):
     '''this function extracts urls from given strings and replaces them a link tag'''
     extractor = URLExtract()
-    urls = extractor.find_urls(field.data)
+    urls = extractor.find_urls(data)
     for url in urls:
         if ('http' or 'https') in url:
             html =f"<a href='{url}' target='_blank' rel='noopener noreferrer'>{url}</a>"
         else:
             html =f"<a href='//{url}' target='_blank' rel='noopener noreferrer'>{url}</a>"
-        field.data =field.data.replace(url,html)
-    return field
+        data =data.replace(url,html)
+    return data
 
 def days(date,to_compare = None,state = None):
     '''this function return date in days and if provided compares two dates and returns the time in days'''

@@ -1,3 +1,4 @@
+{% from 'macros.html' import tasks_viewer %}
 {% extends 'layout.html' %}
 {% block content%}
 <!-- Task Filtering Form -->
@@ -50,56 +51,7 @@
 {% if current_user.department != 'All' and current_user.position in permissions['task_creators'] and due == False%}
     <button type="button" class="btn btn-outline-info" style = 'width: 100%;' data-toggle="modal" data-target="#newModal" >+</button><br></br>
 {% endif%}
-  {% for task in tasks.items %}
-      <article class="media content-section">
-        <img class="rounded-circle data-img" src="{{url_for('static',filename='profile_pics/'+task.author.image_file)}}">
-        <div class="media-body breakAll">
-          <div class="article-metadata">
-            <a class="mr-2" href="{{url_for('profile',username = task.author.username)}}">{{ task.author.first_name + ' ' + task.author.last_name }}</a>
-            <small class="text-muted">{{ task.date_posted.strftime("%d/%m/%Y, %H:%M") }}</small>
-          </div>
-          <h2><a class="article-title" href="{{url_for('view_task',department= task.department,id = task.id,noti=0)}}">{{ task.title }}</a>
-
-            <small><a class="article-department" href="{{url_for('department',department = task.department)}}">{{task.department}}</a></small>
-          </h2>
-          {% if len(task.content) > 200 %}
-            {% if '</a>' in task.content and task.content.index('<a') < 200 %}
-                <p class="article-content"> {{task.content[:(task.content.index('</a>')+4)]|safe}}</a> .... <a 
-                class='read-more' 
-                href="{{url_for('view_task',department= task.department,id =task.id,noti= 0)}}">Read More</a>
-                </p>
-            {% else %}
-                <p class="article-content"> {{task.content[:200]}}'</a> .... <a class = 'read-more' 
-                    href="{{url_for('view_task',department= task.department,id =task.id,noti= 0)}}">Read More</a>
-                </p>
-            {% endif %}
-          {% else %}
-            <p class="article-content"> {{task.content|safe}}</p>
-          {% endif %}
-
-          <div class="article-metadata">
-            {% set date = days(task.deadline) %}
-            {% if date <=0 %}
-                <small class="mr-2">due <b>{{days(task.deadline,state='abs')}}</b> days</small><br>
-            {% else %}
-                <small class="mr-2">Deadline: <b>{{task.deadline.strftime("%d/%m/%Y")}}</b> </small><br>
-            {% endif %}
-            {% if task.file %}
-                <a class="text-muted" href="{{url_for('get_file',location = location,filename = task.file)}}">{{task.file}}</a>
-            {% else %}
-                <a class="text-muted">No attachments provided</a>
-            {% endif %}
-          {% if current_user.is_authenticated %}
-              {% if task.submits.filter_by(user_id = current_user.id,task_id = task.id).first() %}
-                <small STYLE="color: #4BB543" class="btn-float-right">Submitted</small> 
-              {% elif task.excuses.filter_by(user_id= current_user.id,task_id=task.id).first() %}
-                <small STYLE="color: #FFCC00" class="btn-float-right">You have been excused</small>
-              {% endif %}
-           {% endif %} 
-          </div>
-        </div>
-      </article>
-{% endfor %}
+{{ tasks_viewer(tasks,'home',len,days,url_extractor,current_user) }}
 <!-- Pagination -->
 
 {% for page_num in tasks.iter_pages(right_edge = 1,left_edge = 1,left_current = 1,right_current = 2)%}
