@@ -122,16 +122,13 @@
             nav_elements_mobile = document.getElementById('nav-elements-mobile');
             notifications_icon_desktop = document.getElementById('notifications-icon-desktop');
             notifications_icon_mobile = document.getElementById('notifications-icon-mobile');
-            search = document.getElementById('search-div');
+            search_div = document.getElementById('search-div');
+            search =document.getElementById('search');
             result =document.getElementById('result');
 
             var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
             if (isMobile) {
-              if (search){
-                search.style.width ='100%'
-                result.style.width='91%';
-              }
               if (sidebar){
                 sidebar.parentNode.removeChild(sidebar);
               }
@@ -140,6 +137,7 @@
               }
             }
             else{
+              result.style.width = search.offsetWidth;
               logo.classList.add("navbar-brand-desktop");
               nav_elements_mobile.parentNode.removeChild(nav_elements_mobile);
               notifications_icon_mobile.parentNode.removeChild(notifications_icon_mobile);
@@ -171,7 +169,6 @@
           </div>
       </div>
     </main>
-
   <script type="text/javascript" src="/static/scripts/navbar.js"></script>
   <script type="text/javascript" src="/static/scripts/live_search.js"></script>
   <script type="text/javascript" src="/static/scripts/popovers.js"></script>
