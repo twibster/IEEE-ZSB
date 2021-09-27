@@ -160,8 +160,8 @@ class Meetup(db.Model):
     state =db.Column(db.String,nullable=False)
     about = db.Column(db.Text)
     date = db.Column(db.DateTime,nullable = False)
-    long=db.Column(db.Integer,default=0)
-    lat=db.Column(db.Integer,default=0)
+    long=db.Column(db.Float,default=0)
+    lat=db.Column(db.Float,default=0)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     info = db.relationship('Meetup_Info',backref = "meetup", cascade="all, delete")
 
