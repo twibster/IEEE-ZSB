@@ -129,7 +129,7 @@
     {{ form.submit(class="btn btn-outline-info btn-float-right") }}
 </div>
 {% endmacro %}
-{% macro tasks_viewer(tasks,from,len,days,url_extractor,current_user) %}
+{% macro tasks_viewer(tasks,from,len,days,url_extractor,current_user,location) %}
     {%if from=='home'%}
         {% set tasks = tasks.items %}
     {% endif %}
@@ -162,7 +162,7 @@
                   <small class="mr-2">Deadline: <b>{{task.deadline.strftime("%d/%m/%Y")}}</b> </small><br>
               {% endif %}
               {% if task.file %}
-                  <a class="text-muted" href="{{url_for('get_file',location = location,filename = task.file)}}">{{task.file}}</a>
+                  <a class="text-muted" href="{{url_for('get_file',location = config['TASKS_FILE_DOWNLOAD'],filename = task.file)}}">{{task.file}}</a>
               {% else %}
                   <a class="text-muted">No attachments provided</a>
               {% endif %}

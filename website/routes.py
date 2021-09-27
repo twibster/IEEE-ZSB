@@ -61,7 +61,7 @@ def get_tasks():
 @login_required
 def livesearch():
     text = request.form.get('text')
-    if text != '':
+    if text != '' and text:
         departments = dict_generator(Department.query.filter(Department.department.startswith(text.title())),'department','__d__')
         users = dict_generator(User.query.filter(User.username.startswith(text)).limit(3),'username')
         results = users | departments
@@ -100,7 +100,7 @@ def due(department):
         tasks = Task.query.filter(Task.deadline >= datetime.datetime.today() ,Task.department == current_user.department).order_by(Task.date_posted.desc())
         tasks = tasks.paginate(per_page = 3)
     return render_template('home.html',tasks = tasks,due = True,len = len,days =days,permissions=permissions,
-        route = 'due',Submit = Submit,notifications=noti_fetcher(),sidebar=True)
+        route = 'due',url_extractor=url_extractor,Submit = Submit,notifications=noti_fetcher(),sidebar=True)
 
 
 @app.route('/profile/<username>',methods=['GET','POST'])
@@ -128,10 +128,13 @@ def notifications(user_id,mark_as_read):
         abort(403)
     return render_template('notifications.html',notifications_paginated=notifications,notifications=None)
 
-@app.route('/<department>')
+@app.route('/department/<department>')
 @login_required
 @confirmation_required
 def department(department):
+    if not Department.query.filter_by(department=department).first():
+        abort(404)
+
     leaders = User.query.filter(User.department == department,User.position.in_(permissions['task_creators']))
     members = User.query.filter(User.department == department,User.position.in_(permissions['task_submitters']))
     to_display= Department.query.filter_by(department=department).first()
@@ -235,7 +238,7 @@ def register():
             form.department.data='All'
         subscriber = User(first_name = form.first_name.data.capitalize().strip(),
                      last_name = form.last_name.data.capitalize().strip(),
-                     username = form.username.data.strip(), email = form.email.data.strip(),
+                     username = form.username.data.strip().lower(), email = form.email.data.strip().lower(),
                      password = bcrypt.hashpw(form.password.data.encode('utf-8'),bcrypt.gensalt()),
                      department = form.department.data, position = form.position.data,
                      birthdate = form.birthdate.data,age = int(days(form.birthdate.data)/365))
@@ -359,10 +362,10 @@ def account():
             e.missed =form.email_missed.data
             e.excuse =form.email_excuse.data
 
-            if current_user.username != form.username.data:
-                current_user.username = form.username.data
-            if current_user.email != form.email.data:
-                current_user.email = form.email.data
+            if current_user.username != form.username.data.lower():
+                current_user.username = form.username.data.lower()
+            if current_user.email != form.email.data.lower():
+                current_user.email = form.email.data.lower()
                 current_user.confirmed = False
             if len(form.password.data) >2 :
                 current_user.password= bcrypt.hashpw(form.password.data.encode('utf-8'),bcrypt.gensalt())
