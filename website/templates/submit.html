@@ -44,7 +44,7 @@
                           <a class="mr-2" href="{{url_for('profile',username = submit.submitter.username)}}">{{ submit.submitter.first_name + ' ' + submit.submitter.last_name }}</a>
                           <small class="text-muted">{{ submit.date_submitted.strftime("%d/%m/%Y, %H:%M") }}</small>
                         </div>
-                        <p class="article-content"> {{submit.notes}}</p>
+                        <p class="article-content">{{url_extractor(submit.notes)|safe}}</p>
                         <div class="article-metadata">
                           <small class="mr-2">{{days(submit.date_submitted,to_compare = task.deadline)}} days before the deadline</small><br>
                           {% if submit.file %}
