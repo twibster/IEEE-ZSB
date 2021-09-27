@@ -26,7 +26,7 @@
             <p><b>Avg Score:</b>
             {% if to_view.position == 'Team Leader' and len(to_view.tasks) !=0 %} 
               {{to_view.score/len(to_view.tasks)}}
-            {% elif to_view.position == 'Team Member' and len(to_view.tasks) !=0 %}
+            {% elif to_view.position == 'Team Member' and len(to_view.tasks_submitted) !=0 %}
               {{to_view.score/len(to_view.tasks_submitted)}}
             {% else %}
                 0

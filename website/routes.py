@@ -611,12 +611,15 @@ def meetups():
         if form.department.data =='Select a department' or not form.department.data:
             form.department.data=current_user.department
 
+        if not (form.long.data and form.lat.data):
+            form.long.data,form.lat.data =0,0
+
         date =datetime.datetime(form.date.data.year,form.date.data.month,form.date.data.day,
             form.time.data.hour,form.time.data.minute,form.time.data.second)
 
         meetup = Meetup(title = form.title.data,date = date,about = form.about.data,state=form.state.data,
-            organizer = current_user,department = form.department.data,long = form.long.data,
-            lat = form.lat.data)
+            organizer = current_user,department = form.department.data,long = float(form.long.data),
+            lat = float(form.lat.data))
         db.session.add(meetup)
         db.session.commit()
 
@@ -626,13 +629,14 @@ def meetups():
         recipients=[]
         if meetup.department =='All':
             for user in User.query.filter(User.id != current_user.id):
-                if user.noti_settings.first().meetup:
-                    noti = Notifications(type =type, data = text,route = route,data_id = meetup.id,
-                                         to_id= user.id,sender = current_user)
-                    db.session.add(noti)
+                if user.department != 'N/A':
+                    if user.noti_settings.first().meetup:
+                        noti = Notifications(type =type, data = text,route = route,data_id = meetup.id,
+                                             to_id= user.id,sender = current_user)
+                        db.session.add(noti)
 
-                if user.email_settings.first().meetup:
-                    recipients.append(user.email)
+                    if user.email_settings.first().meetup:
+                        recipients.append(user.email)
         else:
             for user in User.query.filter(((User.department == meetup.department) |( User.department=='All')), User.id != current_user.id):
                 if user.noti_settings.first().meetup:
