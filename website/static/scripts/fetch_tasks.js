@@ -1,6 +1,6 @@
 $(document).ready(function(){
-	var typingTimer;                //timer identifier
-  	var doneTypingInterval = 500;  //time in ms
+	var waiting_timer;                //timer identifier
+  	var wait_befor_request = 300;  //time in ms
 	var end= false
 
 	var getData =function(){
@@ -21,8 +21,8 @@ $(document).ready(function(){
 	};
 	window.onscroll = function(ev) {
 	    if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
-		    clearTimeout(typingTimer);
-		    typingTimer = setTimeout(getData, doneTypingInterval);
+		    clearTimeout(waiting_timer);
+		    waiting_timer = setTimeout(getData, wait_befor_request);
 	    }
 	};
 	getData()

@@ -1,4 +1,5 @@
 import datetime,random,os,secrets
+from PIL import Image
 from website import mail,app,message
 from website.models import Notifications
 from flask import render_template,url_for,request,redirect
@@ -159,12 +160,25 @@ def save_file(form_file,location):
     if form_file:
         random_hex = secrets.token_hex(8)
         file_text, file_ext = os.path.splitext(form_file.filename)
-        file_filename = file_text[:20]+random_hex + file_ext
+        file_filename = file_text[:5]+random_hex + file_ext
         file_path = os.path.join(location,file_filename)
         try:
             os.makedirs(location)
         except FileExistsError:
             pass
+            
+        images = ['.jpg','.jpeg','.png']
+        if file_ext in images:
+            form_file = Image.open(form_file)
+            width, height = form_file.size
+            if width > 700 and height >700: 
+                left = round((width - 800)/2)
+                top = round((height - 800)/2)
+                x_right = round(width - 800) - left
+                x_bottom = round(height - 800) - top
+                right = width - x_right
+                bottom = height - x_bottom
+                form_file = form_file.crop((left, top, right, bottom))
             
         form_file.save(file_path)
         return file_filename

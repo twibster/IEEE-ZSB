@@ -111,10 +111,11 @@
 
         {% elif (current_user.department == task.department and current_user.position not in permissions['task_submitters']) or current_user.position in permissions['announcers'] %}
           </div>
-          <button type="button" class="btn btn-danger btn-sm m-1" data-toggle="modal" data-target="#deleteModal">Delete</button>
           {% if current_user.department == task.department%}
             <button type="button" class="btn btn-secondary btn-sm mt-1 mb-1" data-toggle="modal" data-target="#EditModal">Edit Task</button>
           {% endif %}
+          <button type="button" class="btn btn-danger btn-sm m-1" data-toggle="modal" data-target="#deleteModal">Delete</button>
+          
 {#
 <!-- start of a comment in Jinja -->
           <a class="btn-float-right" data-toggle="tooltip" data-placement="bottom" data-html="true"
@@ -143,7 +144,7 @@
   </article>
   <!-- Modal -->
   <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleted" aria-hidden="true">
-    <div class="modal-dialog" role="document">
+    <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="deleted">Delete Task?</h5>
@@ -164,7 +165,7 @@
     </div>
   </div>
    <div class="modal fade" id="EditModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
+    <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="deleteModalLabel">Edit Task</h5>
@@ -234,7 +235,7 @@
     </div>
   </div>
   <div class="modal fade" id="SubmitModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
+    <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="deleteModalLabel">Submit Task</h5>
@@ -278,7 +279,7 @@
     </div>
   </div>
 <div class="modal fade" id="ExcuseModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
+  <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="deleteModalLabel">What is your Excuse?</h5>

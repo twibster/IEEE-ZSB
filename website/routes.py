@@ -574,12 +574,13 @@ def announcements(department,id,noti):
         type,text,route = noti_text('announcement',name=current_user.last_name,date=days(form.validation_date.data,state='abs'))
         if announcement.department =='All':
             for user in User.query.filter(User.id !=current_user.id ):
-                if user.noti_settings.first().announcement:
-                    noti = Notifications(type =type, data = text,route = route,data_id = 0,
-                                         to_id= user.id,sender = current_user)
-                    db.session.add(noti)
-                if user.email_settings.first().announcement:
-                    recipients.append(user.email)
+                if user.department != 'N/A':
+                    if user.noti_settings.first().announcement:
+                        noti = Notifications(type =type, data = text,route = route,data_id = 0,
+                                             to_id= user.id,sender = current_user)
+                        db.session.add(noti)
+                    if user.email_settings.first().announcement:
+                        recipients.append(user.email)
         else:
             for user in User.query.filter(((User.department == announcement.department) |( User.department=='All')), User.id != current_user.id):
                 if user.noti_settings.first().announcement:
