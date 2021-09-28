@@ -45,15 +45,21 @@ def tasks():
 
 @app.route('/get_tasks',methods=['GET','POST'])
 def get_tasks():
+    tasks_query = Task.query.all()
     if request.args.get('api')=='true':
-        return jsonify(dict_generator(Task.query.all(),'title'))
+        return jsonify(dict_generator(tasks_query,'title'))
 
     first,last = session.get('first',None),session.get('last',None)
     if not last:
         first,last =0,4
-    tasks_query =Task.query.all()[first:last]
-    session['first']=last
-    session['last'] = last + 4
+
+    tasks_query =tasks_query[first:last]
+
+    if not tasks_query:
+        return jsonify({})
+    else:
+        session['first']=last
+        session['last'] = last + 4
     return jsonify({'tasks':render_template('task_macro.html',tasks = tasks_query,len=len,days=days,url_extractor=url_extractor)})
 
 @app.route('/livesearch',methods=['POST','GET'])

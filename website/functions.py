@@ -63,9 +63,6 @@ def row2dict(row):
             dict[column.name] = str(getattr(row, column.name))
             if name =='date_posted' or name == 'date_created':
                 dict[name]= getattr(row, column.name).strftime("%d/%m/%Y, %H:%M")
-            elif name =='deadline':
-                dict[name]= f"due {days(getattr(row, column.name),state='abs')} days"
-
         if name =='user_id':
             dict.update(row2dict(row.author))
     return dict

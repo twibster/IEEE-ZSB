@@ -7,7 +7,6 @@ $(document).ready(function(){
 		if (!(end)){
 			$.getJSON('/get_tasks',
 	            function(data) {
-	            	console.log(data)
 	            	end = jQuery.isEmptyObject(data.tasks)
 	            	if (!(end)){
 		                $('#preview').append(data.tasks)
