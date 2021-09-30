@@ -8,6 +8,7 @@ environ_config = {
     "MAIL_USERNAME": os.environ.get('MAIL_USERNAME'),
     "MAIL_PASSWORD": os.environ.get('MAIL_PASSWORD'),
     'SQLALCHEMY_DATABASE_URI': os.environ.get('DATABASE_URL'),
+    'JSON_SORT_KEYS':False,
     'SECRET_KEY': os.environ.get('SECRET_KEY'),
     'GOOGLE_API': os.environ.get('GOOGLE_API'),
     'ADMIN_USERNAME':os.environ.get('ADMIN_USERNAME')

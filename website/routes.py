@@ -45,8 +45,26 @@ def tasks():
 
 @app.route('/get_tasks',methods=['GET','POST'])
 def get_tasks():
-    tasks_query = Task.query.all()
-    if request.args.get('api')=='true':
+    department = request.args.get('department')
+    sort =request.args.get('sort')
+    method =request.args.get('method')
+    api = request.args.get('api')=='true'
+
+    if department:
+        tasks_query = Task.query.filter_by(department=department)
+    else:
+        tasks_query = Task.query.order_by(Task.date_posted.desc())
+
+    if sort:
+        try:
+            if method =='desc' or not method:
+                tasks_query = Task.query.order_by(getattr(Task, sort).desc())
+            elif method =='asc':
+                tasks_query = Task.query.order_by(getattr(Task, sort).asc())
+        except AttributeError:
+            return jsonify('Invalid query, recheck your parameters')
+        
+    if api:
         return jsonify(dict_generator(tasks_query,'title'))
 
     first,last = session.get('first',None),session.get('last',None)
