@@ -88,7 +88,8 @@ def livesearch():
     if text != '' and text:
         departments = dict_generator(Department.query.filter(Department.department.startswith(text.title())),'department','__d__')
         users = dict_generator(User.query.filter(User.username.startswith(text)).limit(3),'username')
-        results = users | departments
+        tasks = dict_generator(Task.query.filter(Task.title.startswith(text)).limit(5),'title','__t__')
+        results = users | departments | tasks
     else:
         results={}
 
