@@ -1,6 +1,6 @@
 $(document).ready(function(){
   var typingTimer;                //timer identifier
-  var doneTypingInterval = 200;  //time in ms
+  var doneTypingInterval = 500;  //time in ms
 
   //on keyup, start the countdown
   $('#search').keyup(function(){

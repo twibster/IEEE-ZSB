@@ -87,8 +87,8 @@ def livesearch():
     text = request.form.get('text')
     if text != '' and text:
         departments = dict_generator(Department.query.filter(Department.department.startswith(text.title())),'department','__d__')
-        users = dict_generator(User.query.filter(User.username.startswith(text)).limit(3),'username')
-        tasks = dict_generator(Task.query.filter(Task.title.startswith(text)).limit(5),'title','__t__')
+        users = dict_generator(User.query.filter((User.first_name.ilike(f'%{text}%')) | (User.last_name.ilike(f'%{text}%')) | (User.username.startswith(text))).limit(3),'username')
+        tasks = dict_generator(Task.query.filter(Task.title.ilike(f'%{text}%')).limit(5),'title','__t__')
         results = users | departments | tasks
     else:
         results={}
@@ -286,8 +286,8 @@ def register():
 @logout_required
 def login():
     form = LoginForm()
-    creds = form.username_email.data
     if form.validate_on_submit():
+        creds = form.username_email.data.strip().lower()
         loginer = User.query.filter((User.username ==creds) | (User.email==creds)).first()
         if loginer:
             if bcrypt.checkpw(form.password.data.encode('utf-8'), loginer.password):
@@ -301,7 +301,7 @@ def login():
             else:
                 flash('Incorrect email or password','danger')
         else:
-            flash("This user is not registered",'danger')
+            flash('Incorrect email or password','danger')
     return render_template('login.html',title= 'Login',form = form)
 
 @app.route('/reset_request/<int:state>',methods=['GET','POST'])
