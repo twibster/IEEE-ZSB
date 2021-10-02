@@ -15,7 +15,12 @@ $(document).ready(function(){
 	var getData =function(department,sort,method,transition){
 		if (!(end)){
 			if (typeof department !== 'undefined'){
-				 url='/get_tasks?department='+department+'&sort='+sort+'&method='+method+''
+				if (transition){
+				 	url='/get_tasks?department='+department+'&sort='+sort+'&method='+method+'&butt=true'
+				}
+				else{
+					url='/get_tasks?department='+department+'&sort='+sort+'&method='+method+''
+				}
 			}
 			else{
 				url='/get_tasks'

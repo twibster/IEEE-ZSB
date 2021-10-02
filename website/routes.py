@@ -34,12 +34,13 @@ def get_file(location,filename):
         return send_from_directory(location,filename,as_attachment =False)
     except FileNotFoundError:
         abort(404)
-        
+
 @app.route('/get_tasks',methods=['GET','POST'])
 def get_tasks():
     department = request.args.get('department')
     sort =request.args.get('sort')
     method =request.args.get('method')
+    butt =request.args.get('butt')
     api = request.args.get('api')=='true'
 
     if department:
@@ -60,7 +61,7 @@ def get_tasks():
         return jsonify(dict_generator(tasks_query,'title'))
 
     first,last = session.get('first',None),session.get('last',None)
-    if not last:
+    if not last or butt:
         first,last =0,4
 
     tasks_query =tasks_query[first:last]
