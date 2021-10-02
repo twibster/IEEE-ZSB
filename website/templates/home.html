@@ -42,8 +42,9 @@
             {% endif %}
         </div>
         <div class="form-group" style='display: inline-block;'>
-          {{ filter_form.filter(class="btn btn-outline-info filter") }}
+            <button class="btn btn-outline-info filter" id="filter" type='button'>Filter</button>
         </div>
+
   </form>
 {% endif %}
 <!-- end of Task Filtering Form -->
@@ -51,24 +52,13 @@
 {% if current_user.department != 'All' and current_user.position in permissions['task_creators'] and due == False%}
     <button type="button" class="btn btn-outline-info" style = 'width: 100%;' data-toggle="modal" data-target="#newModal" >+</button><br></br>
 {% endif%}
-{{ tasks_viewer(tasks,'home',len,days,url_extractor,current_user,location) }}
-<!-- Pagination -->
 
-{% for page_num in tasks.iter_pages(right_edge = 1,left_edge = 1,left_current = 1,right_current = 2)%}
-{% if page_num %}
-  {% if not(tasks.page == 1 and tasks.has_next == False)%}
-    {% if tasks.page == page_num %}
-      <a class="btn btn-info mb-4" href=
-                "{{url_for(route,page = page_num,sort=sort,method=method,dep =dep,department=current_user.department)}}">{{page_num}}</a>
-    {% else %}
-      <a class="btn btn-outline-info mb-4" href="{{url_for(route,page = page_num,sort=sort,method=method,dep =dep,department=current_user.department)}}">{{page_num}}</a>
-    {% endif%}
-  {% endif %}
-{% else %}
-  ...
-{% endif%}
-{% endfor %}
-<!--  end of Pagination -->
+<!-- Infinit Task Viewer -->
+
+<div id='preview'></div>
+<script type="text/javascript" src="/static/scripts/fetch_tasks.js"></script>
+
+<!-- end of Infint Task Viewer-->
 
 <!-- Task Creation Modal-->
 {% if due == False %}
@@ -142,7 +132,7 @@
     </div>
 </div>
 {% endif %}
-<!-- end of Task Creating Modal-->
+<!-- end of Task Creation Modal-->
 {% if due ==False %}
     {% if form.title.errors or form.deadline.errors %}
         <script src="/static/scripts/force_modal.js"></script>

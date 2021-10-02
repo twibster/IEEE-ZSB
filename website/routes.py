@@ -34,15 +34,7 @@ def get_file(location,filename):
         return send_from_directory(location,filename,as_attachment =False)
     except FileNotFoundError:
         abort(404)
-
-@app.route('/tasks',methods=['GET','POST'])
-def tasks():
-    try:
-        session.pop('last',None)
-    except KeyError:
-        pass
-    return render_template('experimental.html')
-
+        
 @app.route('/get_tasks',methods=['GET','POST'])
 def get_tasks():
     department = request.args.get('department')
@@ -58,9 +50,9 @@ def get_tasks():
     if sort:
         try:
             if method =='desc' or not method:
-                tasks_query = Task.query.order_by(getattr(Task, sort).desc())
+                tasks_query = tasks_query.order_by(getattr(Task, sort).desc())
             elif method =='asc':
-                tasks_query = Task.query.order_by(getattr(Task, sort).asc())
+                tasks_query = tasks_query.order_by(getattr(Task, sort).asc())
         except AttributeError:
             return jsonify('Invalid query, recheck your parameters')
         
@@ -74,6 +66,10 @@ def get_tasks():
     tasks_query =tasks_query[first:last]
 
     if not tasks_query:
+        try:
+            session.pop('last')
+        except KeyError:
+            pass
         return jsonify({})
     else:
         session['first']=last
@@ -184,13 +180,13 @@ def submits(department,task_id):
 @login_required
 @confirmation_required
 def home(sort,method,dep):
-    filter_form = FilterForm()
+    try:
+        session.pop('last',None)
+    except KeyError:
+        pass
+
     new_form = NewTaskForm()
-
-    if filter_form.validate_on_submit() and filter_form.filter.data:
-        dep,sort,method =filter_form.department.data,filter_form.sort.data,filter_form.method.data
-
-    elif new_form.validate_on_submit() and new_form.submit.data:
+    if new_form.validate_on_submit() and new_form.submit.data:
 
         new_task = Task(author = current_user ,title = new_form.title.data, content= new_form.content.data,
             deadline = new_form.deadline.data,file = save_file(new_form.file.data,app.config['TASKS_FILE']),
@@ -221,37 +217,10 @@ def home(sort,method,dep):
         db.session.commit()
         flash("Task created successfully",'success')
         return redirect(url_for('home'))
-    else:
-        task=Task.query.order_by(Task.date_posted.desc())
 
-    if dep:
-        task=Task.query.filter_by(department=dep)
-
-    if sort == 'Date Posted' and method =='asc':
-        task = task.order_by(Task.date_posted.asc()).paginate(per_page = 3)
-    elif sort == 'Title' and method =='asc':
-        task = task.order_by(Task.title.asc()).paginate(per_page = 3)
-    elif sort =='Deadline' and method =='asc':
-        task = task.order_by(Task.deadline.asc()).paginate(per_page = 3)
-    elif sort =='Submits Count' and method == 'asc':
-        task = task.order_by(Task.submits_count.asc()).paginate(per_page = 3)
-    elif sort == 'Date Posted' and method =='desc':
-        task = task.order_by(Task.date_posted.desc()).paginate(per_page = 3)
-    elif sort == 'Title' and method =='desc':
-        task = task.order_by(Task.title.desc()).paginate(per_page = 3)
-    elif sort =='Deadline' and method =='desc':
-        task = task.order_by(Task.deadline.desc()).paginate(per_page = 3)
-    elif sort =='Submits Count' and method == 'desc':
-        task = task.order_by(Task.submits_count.desc()).paginate(per_page = 3)
-
-    if request.method =='GET':
-        filter_form.sort.data=sort
-        filter_form.method.data=method
-        filter_form.department.data =dep
-
-    return render_template('home.html',tasks =task,Submit = Submit,permissions=permissions,
+    return render_template('home.html',Submit = Submit,permissions=permissions,
      due = False,sidebar =True, notifications=noti_fetcher(),
-     days = days,filter_form =filter_form,form = new_form,location=app.config['TASKS_FILE_DOWNLOAD'],
+     days = days,filter_form =FilterForm(),form = new_form,location=app.config['TASKS_FILE_DOWNLOAD'],
      len = len,route = 'home',sort=sort,method=method,dep=dep,url_extractor=url_extractor)
 
 @app.route("/register",methods=['GET','POST'])

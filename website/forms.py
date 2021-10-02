@@ -132,7 +132,8 @@ class FilterForm(FlaskForm):
 	department = SelectField('Department',choices =["Post-department",'Deep Learning',"PID Control","ROS",
 								"Kinematics","Embedded Systems","Maze Solving Algorithm","Mechanical"],
 								validators = [DataRequired()])
-	sort = SelectField('Sort',choices = ['Submits Count','Date Posted','Deadline','Title'])
+	sort = SelectField('Sort',choices = [('submits_count','Submits Count'),('date_posted','Date Posted')
+										,('deadline','Deadline'),('title','Title')])
 	method = SelectField('Method',choices=[('asc','↑'),('desc','↓')])
 	filter = SubmitField('Filter')
 
