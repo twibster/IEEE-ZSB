@@ -1,6 +1,6 @@
 import datetime,random,os,secrets
 from PIL import Image
-from website import mail,app,message
+from website import mail,app,message,db
 from website.models import Notifications
 from flask import render_template,url_for,request,redirect
 from flask_login import current_user
