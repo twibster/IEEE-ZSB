@@ -144,7 +144,7 @@ def notifications(user_id,mark_as_read):
                 noti.clicked=True
             db.session.commit()
             flash('All unread notifications have been marked as read','success')
-        notifications = Notifications.query.filter_by(to_id =user_id).paginate(per_page=15)
+        notifications = Notifications.query.filter_by(to_id =user_id).order_by(Notifications.date.desc()).paginate(per_page=15)
     else:
         abort(403)
     return render_template('notifications.html',notifications_paginated=notifications,notifications=None)
