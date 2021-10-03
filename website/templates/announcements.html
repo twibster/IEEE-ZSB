@@ -16,7 +16,7 @@
             <img class="rounded-circle data-img column" src="{{url_for('static',filename='profile_pics/'+announcement.announcer.image_file)}}">
             <div style="display: inline-block;">
                 <a class="mr-2" href="{{url_for('profile',username = announcement.announcer.username)}}">{{ announcement.announcer.first_name + ' ' + announcement.announcer.last_name }}</a>
-                <small style="display:block;" class="text-muted">{{ announcement.date_announced.strftime("%d/%m/%Y, %H:%M") }}
+                <small style="display:block;" class="text-muted">{{display_time(announcement.date_announced)}}
                 </small>
                 for
                 <b> 

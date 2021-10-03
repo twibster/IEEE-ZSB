@@ -8,6 +8,22 @@ from threading import Thread
 from urlextract import URLExtract
 from functools import wraps
 
+def display_time(date):
+    now =datetime.datetime.utcnow()
+    time =round((now-date).total_seconds())
+    if time <120:
+        display ='Just now' 
+    elif time<3600:
+        display= f'{round(time/60)}m ago'
+    elif time<86400:
+        display= f'{round((time/60)/60)}h ago'
+    elif time<172800:
+        display= f"Yesterday at {date.strftime('%I:%M %p')}"
+    elif date.year ==now.year:
+        display= date.strftime('%b %d at %I:%M %p')
+    else:
+        display= date.strftime('%B %d, %Y')
+    return display
 
 def noti_clearer(noti):
     '''mark a notification as clicked (seen)'''

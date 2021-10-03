@@ -10,7 +10,7 @@ from website import app,db,ModelView,AdminIndexView
 from flask_login import login_user,current_user,logout_user,login_required
 from website.functions import (days,save_file,noti_text,mail_sender,url_extractor,
                               dict_generator,confirmation_required,logout_required,
-                              confirm_view,noti_fetcher,noti_clearer)
+                              confirm_view,noti_fetcher,noti_clearer,display_time)
 
 permissions={
     'task_creators':['IEEE Chairman','Vice Technical',"RAS Chairman",'RAS Vice Chairman',"Team Leader"],
@@ -75,7 +75,7 @@ def get_tasks():
     else:
         session['first']=last
         session['last'] = last + 4
-    return jsonify({'tasks':render_template('task_macro.html',tasks = tasks_query,len=len,days=days,url_extractor=url_extractor)})
+    return jsonify({'tasks':render_template('task_macro.html',tasks = tasks_query,len=len,days=days,url_extractor=url_extractor,display_time=display_time)})
 
 @app.route('/livesearch',methods=['POST','GET'])
 @confirmation_required
@@ -121,7 +121,7 @@ def due(department):
     else:
         tasks = Task.query.filter(Task.deadline >= datetime.datetime.today() ,Task.department == current_user.department).order_by(Task.date_posted.desc())
         tasks = tasks.paginate(per_page = 3)
-    return render_template('home.html',tasks = tasks,due = True,len = len,days =days,permissions=permissions,
+    return render_template('home.html',tasks = tasks,due = True,len = len,display_time=display_time,days =days,permissions=permissions,
         route = 'due',url_extractor=url_extractor,Submit = Submit,notifications=noti_fetcher(),sidebar=True)
 
 
@@ -148,7 +148,7 @@ def notifications(user_id,mark_as_read):
         notifications = Notifications.query.filter_by(to_id =user_id).order_by(Notifications.date.desc()).paginate(per_page=15)
     else:
         abort(403)
-    return render_template('notifications.html',notifications_paginated=notifications,notifications=None)
+    return render_template('notifications.html',display_time=display_time,notifications_paginated=notifications,notifications=None)
 
 @app.route('/department/<department>')
 @login_required
@@ -170,7 +170,7 @@ def department(department):
 def submits(department,task_id):
     form = FeedbackForm()
     return render_template('submits.html',days= days,
-        location = app.config['SUBMITS_FILE_DOWNLOAD'],notifications=noti_fetcher(),
+        location = app.config['SUBMITS_FILE_DOWNLOAD'],notifications=noti_fetcher(),display_time=display_time,
         task = Task.query.get(task_id),permissions=permissions,url_extractor=url_extractor,
         submits = Submit.query.filter_by(task_id = task_id).order_by(Submit.date_submitted.desc()).paginate(per_page = 3))
 
@@ -220,7 +220,7 @@ def home(sort,method,dep):
         return redirect(url_for('home'))
 
     return render_template('home.html',Submit = Submit,permissions=permissions,
-     due = False,sidebar =True, notifications=noti_fetcher(),
+     due = False,sidebar =True, notifications=noti_fetcher(),display_time=display_time,
      days = days,filter_form =FilterForm(),form = new_form,location=app.config['TASKS_FILE_DOWNLOAD'],
      len = len,route = 'home',sort=sort,method=method,dep=dep,url_extractor=url_extractor)
 
@@ -513,7 +513,8 @@ def view_task(department,id,noti):
             db.session.commit()
             mail_sender(recipients=recipients,content='tech',type=type,text=text)
 
-    return render_template('task.html',title = task.title,task = task,new_form=new_form,missed = missed,permissions=permissions
+    return render_template('task.html',title = task.title,task = task,new_form=new_form,missed = missed,display_time=display_time,
+        permissions=permissions
         ,submit_form = submit_form,Excuseform = Excuseform,excuses =excuses,excuse= excuse,notifications=noti_fetcher()
         ,location=app.config['TASKS_FILE_DOWNLOAD'],days = days,submit = submit,submits= submits,url_extractor=url_extractor,
         len = len,datetime = datetime)
@@ -547,7 +548,8 @@ def view_submit(department,id,submit_id,noti):
         flash('Your feedback has been delivered','success')
         return redirect(url_for('submits',task_id = id,department = department))
 
-    return render_template('submit.html',submit= submit,days = days,permissions=permissions,url_extractor=url_extractor,
+    return render_template('submit.html',submit= submit,days = days,display_time=display_time,
+        permissions=permissions,url_extractor=url_extractor,
         location=app.config['SUBMITS_FILE_DOWNLOAD'],task = task,form = form,notifications=noti_fetcher())
 
 @app.route('/announcements/<department>/<int:id>-<int:noti>',methods =['POST','GET'])
@@ -595,7 +597,8 @@ def announcements(department,id,noti):
             db.session.delete(Announce.query.get(id))
             db.session.commit()
 
-    return render_template('announcements.html',form =form,url_extractor=url_extractor,sidebar=True,notifications=noti_fetcher(),permissions=permissions,
+    return render_template('announcements.html',form =form,url_extractor=url_extractor,display_time=display_time,
+        sidebar=True,notifications=noti_fetcher(),permissions=permissions,
         announcements = Announce.query.order_by(Announce.date_announced.desc()).paginate(per_page = 5))
 
 @app.route('/meetups',methods =['POST','GET'])
@@ -647,7 +650,8 @@ def meetups():
         mail_sender(recipients=recipients,content='tech',type=type,text=text)
         db.session.commit()
         flash('Meet-up created successfully','success')
-    return render_template('meet-ups.html',form =form,sidebar= True,url_extractor=url_extractor,notifications=noti_fetcher(),permissions=permissions,
+    return render_template('meet-ups.html',form =form,sidebar= True,display_time=display_time,
+        url_extractor=url_extractor,notifications=noti_fetcher(),permissions=permissions,
         meetups = Meetup.query.order_by(Meetup.date_created.desc()).paginate(per_page = 5))
 
 @app.route('/meetups/<department>/<int:id>-<int:noti>',methods=['POST','GET'])
@@ -693,7 +697,8 @@ def meetup(department,id,noti):
         db.session.commit()
         return(redirect(url_for('meetup',department = department,id =id,noti=0)))
 
-    return render_template('meetup.html',meetup = meetup,Excuseform = Excuseform,url_extractor=url_extractor,notifications=noti_fetcher(),
+    return render_template('meetup.html',meetup = meetup,display_time=display_time,
+        Excuseform = Excuseform,url_extractor=url_extractor,notifications=noti_fetcher(),
         excuses = excuses,confirms =confirms,user_info = user_info,len=len,permissions= permissions)
 
 class MyModelView(ModelView):
