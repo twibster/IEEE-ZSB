@@ -1,4 +1,4 @@
-{% macro notifications_template(notifications,current_user,id,class,res) %}
+{% macro notifications_template(notifications,current_user,id,class,res,display_time) %}
     {% if notifications %}
         <a tabindex="0" class="{{class}}" href='#' data-toggle="popover" title="<b>Notifications</b>"
          data-placement="bottom" data-html="true" id='{{id}}' data-content=" 

@@ -31,7 +31,7 @@
           <a class="navbar-brand" href="{{url_for('home')}}">
             <img src="{{url_for('static',filename='img/logo2.png')}}" alt="" id='logo'>
           </a>
-          {{ notifications_template(notifications,current_user,'notifications-icon-mobile','navbar-brand',19) }}
+          {{ notifications_template(notifications,current_user,'notifications-icon-mobile','navbar-brand',19,display_time) }}
           <div class="collapse navbar-collapse" id="navbarToggle">
             <div class="navbar-nav mr-auto">
               <a class="nav-item nav-link" href="{{url_for('home')}}">Home</a>
@@ -46,7 +46,7 @@
             <!-- Navbar Right Side -->
             <div class="navbar-nav">
               {% if logged_in %}
-                    {{ notifications_template(notifications,current_user,'notifications-icon-desktop','nav-item nav-link',16) }}
+                    {{ notifications_template(notifications,current_user,'notifications-icon-desktop','nav-item nav-link',16,display_time) }}
                 <div class='nav-bar-mobile-div' id='nav-elements-mobile'>
                   {% if department != 'All' %}
                     <a class = "nav-item nav-link" href="{{url_for('due',
