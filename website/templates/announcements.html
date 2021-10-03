@@ -3,7 +3,7 @@
 
 <!-- New Announcement Button -->
 {% if current_user.position in permissions['task_creators'] %}
-    <button type="button" class="btn btn-outline-info" style = 'width: 100%;' data-toggle="modal" data-target="#newModal" >Announce Something</button>
+    <button type="button" class="btn btn-outline-info" style = 'width: 100%;' data-toggle="modal" data-target="#newModal" >Announce Something</button><br></br>
 {% endif %}
 <!-- end of New Announcement Button -->
 
@@ -11,29 +11,31 @@
 {% for announcement in announcements.items %}
     {% set department =announcement.department %}
     <article class="media content-section">
-        <img class="rounded-circle data-img" src="{{url_for('static',filename='profile_pics/'+announcement.announcer.image_file)}}">
         <div class="media-body breakAll">
-          <div class="article-metadata">
-            <a class="mr-2" href="{{url_for('profile',username = announcement.announcer.username)}}">{{ announcement.announcer.first_name + ' ' + announcement.announcer.last_name }}</a>
-            <small class="text-muted">{{ announcement.date_announced.strftime("%d/%m/%Y, %H:%M") }}</small>
+          <div class="article-metadata row">
+            <img class="rounded-circle data-img column" src="{{url_for('static',filename='profile_pics/'+announcement.announcer.image_file)}}">
+            <div style="display: inline-block;">
+                <a class="mr-2" href="{{url_for('profile',username = announcement.announcer.username)}}">{{ announcement.announcer.first_name + ' ' + announcement.announcer.last_name }}</a>
+                <small style="display:block;" class="text-muted">{{ announcement.date_announced.strftime("%d/%m/%Y, %H:%M") }}
+                </small>
+                for
+                <b> 
+                    {% if department !='All' %}
+                        <a class="article-title" href="{{url_for('department',department = department)}}">
+                            {{department}}
+                        </a>
+                    {% else %}
+                        All departments
+                    {% endif%}
+                </b>
+            </div>
           </div>
-          <h3>
-            for 
-            {% if department !='All' %}
-                <a class="article-title" href="{{url_for('department',department = department)}}">
-                    {{department}}
-                </a>
-            {% else %}
-                All departments
-            {% endif%}
-          </h3><br>
-           <p class="article-content"> {{url_extractor(announcement.content)|safe}}</p>
-
-            <small class="mr-2"><b>Valid Until</b>: {{announcement.validation_date.strftime("%d/%m/%Y, %H:%M")}}</small><br>
-            {% if current_user.id == announcement.announcer.id or current_user.position in permissions['announcers'] %}
-                <a href="{{url_for('announcements',department=department,id = announcement.id,noti=0)}}" 
-                class="btn btn-danger btn-sm m-1 btn-float-right">Delete</a>
-            {% endif %}
+               <p class="article-content"> {{url_extractor(announcement.content)|safe}}</p>
+                <small class="mr-2"><b>Valid Until</b>: {{announcement.validation_date.strftime("%d/%m/%Y, %H:%M")}}</small><br>
+                {% if current_user.id == announcement.announcer.id or current_user.position in permissions['announcers'] %}
+                    <a href="{{url_for('announcements',department=department,id = announcement.id,noti=0)}}" 
+                    class="btn btn-danger btn-sm m-1 btn-float-right">Delete</a>
+                {% endif %}
         </div>
     </article>
 {% endfor %}

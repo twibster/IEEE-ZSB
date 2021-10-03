@@ -13,24 +13,26 @@
 <!-- meetups Displayer -->
 {% for meetup in meetups.items %}
     {% set meetup_href = url_for('meetup',department=meetup.department,id = meetup.id,noti=0) %}
-    <article class="media content-section">
-        <img class="rounded-circle data-img" src="{{url_for('static',filename='profile_pics/'+meetup.organizer.image_file)}}">
-        <div class="media-body breakAll">
-          <div class="article-metadata">
-            <a class="mr-2" href="{{url_for('profile',username = meetup.organizer.username)}}">{{ meetup.organizer.first_name + ' ' + meetup.organizer.last_name }}</a>
-            <small class="text-muted">{{ meetup.date_created.strftime("%d/%m/%Y, %H:%M") }}</small>
-          </div>
-          <div class="article-metadata">
-            <h2><a class="article-title" href="{{meetup_href}}">{{ meetup.title }}</a>
-                {% if meetup.department !='All' %}
-                    <small><a class="article-department" href="{{url_for('department',department = meetup.department)}}">{{meetup.department}}</a> <small style='font-size: 12px'>({{meetup.state}})</small></small>
-                {% else %}
-                    <small class='article-department'>All departments <small style='font-size: 12px'>({{meetup.state}})</small></small>
-                {% endif%}
-            </h2>
+    <article class="media content-section breakAll">
+        <div class="media-body">
+            <div class="article-metadata row">
+              <img class="rounded-circle data-img column" src="{{url_for('static',filename='profile_pics/'+meetup.organizer.image_file)}}">
+              <div style="display: inline-block;">
+                  <a class="mr-2" href="{{url_for('profile',username = meetup.organizer.username)}}">{{ meetup.organizer.first_name + ' ' + meetup.organizer.last_name }}</a>
+                  <small style='display:block;' class="text-muted">{{ meetup.date_created.strftime("%d/%m/%Y, %H:%M") }}</small>
+                  <a class="article-title" href="{{meetup_href}}"><b>{{ meetup.title }}</b></a>
+                  {% if meetup.department !='All' %}
+                    <small><a class="article-department" href="{{url_for('department',department = meetup.department)}}"><b>{{meetup.department}}</b></a> <small style='font-size: 12px'>({{meetup.state}})</small> </small>
+                  {% else %}
+                    <small class='article-department'>
+                        All departments
+                     <small style='font-size: 12px'>({{meetup.state}})</small> 
+                    </small>
+                  {% endif%}
+              </div>
+            </div>
             <p class="article-content"> {{url_extractor(meetup.about)|safe}}</p>
-            <small class="mr-2"><b>Meeting time: </b>{{meetup.date}}</small>
-          </div>
+            <small style='display: block;'class="mr-2 article-metadata"><b>Meeting time: </b>{{meetup.date}}</small>
           {% if meetup.state=='Offline' %}
             <a href="{{meetup_href}}">location</a>
           {% endif %}

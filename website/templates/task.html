@@ -62,16 +62,25 @@
 {% endblock column %}
 {% block content%}
   <article class="media content-section">
-    <img class="rounded-circle data-img" src="{{url_for('static',filename='profile_pics/'+task.author.image_file)}}">
     <div class="media-body breakAll">
-      <div class="article-metadata">
-        <a class="mr-2" href="{{url_for('profile',username = task.author.username)}}">{{ task.author.first_name + ' ' + task.author.last_name }}</a>
-        <small class="text-muted">{{ task.date_posted.strftime("%d/%m/%Y, %H:%M") }}</small>
+      <div class="article-metadata row">
+        <img class="rounded-circle data-img column" src="{{url_for('static',filename='profile_pics/'+task.author.image_file)}}" style="display:inline-block;">
+        <div style="display: inline-block;">
+            <a class="mr-2" href="{{url_for('profile',username = task.author.username)}}">
+              {{ task.author.first_name + ' ' + task.author.last_name }}
+            </a>
+            <small style='display: block;'class="text-muted">{{ task.date_posted.strftime("%d/%m/%Y, %H:%M") }}</small>
+            <a class="article-title" 
+              href="{{url_for('view_task',department= task.department,id = task.id,noti=0)}}">
+              <b>{{ task.title }}</b>
+            </a>
+            <small>
+              <a class="article-department" href="{{url_for('department',department = task.department)}}">{{task.department}}
+              </a>
+            </small>
+        </div>
       </div>
-        <h2 class="article-title" >{{ task.title }}
-          <small class="text-muted">{{ task.department }}</small>
-        </h2>
-        <p class="article-content"> {{url_extractor(task.content)|safe}}</p>
+      <p class="article-content"> {{url_extractor(task.content)|safe}}</p>
       <div class="article-metadata">
         {% set date = days(task.deadline) %}
             {% if date <=0 %}

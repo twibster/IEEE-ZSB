@@ -33,22 +33,29 @@
 </div>
 {% endblock column %}
 {% block content%}
-<article class="media content-section">
-  <img class="rounded-circle data-img" src="{{url_for('static',filename='profile_pics/'+meetup.organizer.image_file)}}">
-  <div class="media-body breakAll">
-    <div class="article-metadata">
-      <a class="mr-2" href="{{url_for('profile',username = meetup.organizer.username)}}">{{ meetup.organizer.first_name + ' ' + meetup.organizer.last_name }}</a>
-      <small class="text-muted">{{ meetup.date_created.strftime("%d/%m/%Y, %H:%M") }}</small>
-    </div>
-    <div class="article-metadata">
-      <h2 class="article-title" >{{ meetup.title }}
-        <small class="text-muted">{{ meetup.department }}<small style='font-size: 12px'>({{meetup.state}})</small></small>
-      </h2>
+<article class="media content-section breakAll">
+  <div class="media-body">
+      <div class="article-metadata row">
+        <img class="rounded-circle data-img column" src="{{url_for('static',filename='profile_pics/'+meetup.organizer.image_file)}}">
+        <div style="display: inline-block;">
+            <a class="mr-2" href="{{url_for('profile',username = meetup.organizer.username)}}">{{ meetup.organizer.first_name + ' ' + meetup.organizer.last_name }}</a>
+            <small style='display:block;' class="text-muted">{{ meetup.date_created.strftime("%d/%m/%Y, %H:%M") }}</small>
+            <a class="article-title" href="{{meetup_href}}"><b>{{ meetup.title }}</b></a>
+            {% if meetup.department !='All' %}
+              <small><a class="article-department" href="{{url_for('department',department = meetup.department)}}"><b>{{meetup.department}}</b></a> <small style='font-size: 12px'>({{meetup.state}})</small> </small>
+            {% else %}
+              <small class='article-department'>
+                  All departments
+               <small style='font-size: 12px'>({{meetup.state}})</small> 
+              </small>
+            {% endif%}
+        </div>
+      </div>
       <p class="article-content"> {{url_extractor(meetup.about)|safe}}</p>
-      <small class="mr-2"><b>Date: </b>{{meetup.date.strftime("%d/%m/%Y, %H:%M")}}</small><br></br>
+      <small style='display: block;'class="mr-2"><b>Meeting time: </b>{{meetup.date}}</small>
       {% if meetup.state=='Offline' %}
         <legend class="border-bottom mb-4" style="text-align:center;"><b>location</b></legend>
-        <div class='article-metadata' id ="map" style='height: 500px;width: 100%px;'></div>
+        <div class='article-metadata' id ="map" style='height: 500px;width: 100%;'></div>
         <script>
             function initMap() {
               const where_am_i = { lat: {{meetup.lat}}, lng: {{meetup.long}} };
@@ -65,7 +72,6 @@
             }
         </script>
       {% endif %}
-    </div>
     <form method="post" action="">
       {% if current_user.position in permissions['announcers'] or current_user.id== meetup.organizer.id%}
           <input type='submit' value ='Delete' name='Delete' style='width: 15%;' 
