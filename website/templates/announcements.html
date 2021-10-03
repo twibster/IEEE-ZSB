@@ -42,6 +42,7 @@
 <!-- end of Announcements Displayer -->
 
 <!-- Pagination -->
+<div class='center'>
   {% for page_num in announcements.iter_pages(right_edge = 1,left_edge = 1,left_current = 1,right_current = 2)%}
     {% if page_num %}
       {% if not(announcements.page == 1 and announcements.has_next == False)%}
@@ -57,6 +58,7 @@
       ...
     {% endif%}
   {% endfor %}
+</div>
 <!--  end of Pagination -->
 
 <!-- start of Announcement Modal -->

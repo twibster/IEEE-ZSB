@@ -54,11 +54,35 @@
 {% endif%}
 
 <!-- Infinit Task Viewer -->
-
-<div id='preview'></div>
-<script type="text/javascript" src="/static/scripts/fetch_tasks.js"></script>
-
+{% if due == False %}
+    <div id='preview'></div>
+    <script type="text/javascript" src="/static/scripts/fetch_tasks.js"></script>
 <!-- end of Infint Task Viewer-->
+{% else %}
+    {{ tasks_viewer(tasks,'home',len,days,url_extractor,current_user,location) }}
+
+<!-- Pagination -->
+    <div class='center'>
+        {% for page_num in tasks.iter_pages(right_edge = 1,left_edge = 1,left_current = 1,right_current = 2)%}
+        {% if page_num %}
+          {% if not(tasks.page == 1 and tasks.has_next == False)%}
+            {% if tasks.page == page_num %}
+              <a class="btn btn-info mb-4" href=
+                        "{{url_for(route,page = page_num,sort=sort,method=method,dep =dep,department=current_user.department)}}">{{page_num}}</a>
+            {% else %}
+              <a class="btn btn-outline-info mb-4" href="{{url_for(route,page = page_num,sort=sort,method=method,dep =dep,department=current_user.department)}}">{{page_num}}</a>
+            {% endif%}
+          {% endif %}
+        {% else %}
+          ...
+        {% endif%}
+        {% endfor %}
+    </div>
+ <!--  end of Pagination -->
+{% endif %}
+
+
+
 
 <!-- Task Creation Modal-->
 {% if due == False %}

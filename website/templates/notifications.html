@@ -28,17 +28,19 @@
    {% endfor %}
 </div>
 
-{% for page_num in notifications_paginated.iter_pages(right_edge = 1,left_edge = 1,left_current = 1,right_current = 2)%}
-  {% if page_num %}
-    {% if not(notifications_paginated.page == 1 and notifications_paginated.has_next == False)%}
-      {% if notifications.page == page_num %}
-        <a class="btn btn-info mb-4" href="{{url_for('notifications',page = page_num,user_id =current_user.id,mark_as_read =0)}}">{{page_num}}</a>
-      {% else %}
-        <a class="btn btn-outline-info mb-4" href="{{url_for('notifications',page = page_num,user_id =current_user.id,mark_as_read=0)}}">{{page_num}}</a>
-      {% endif%}
-    {% endif %}
-  {% else %}
-    ...
-  {% endif%}
-{% endfor %}
+<div class='center'>
+  {% for page_num in notifications_paginated.iter_pages(right_edge = 1,left_edge = 1,left_current = 1,right_current = 2)%}
+    {% if page_num %}
+      {% if not(notifications_paginated.page == 1 and notifications_paginated.has_next == False)%}
+        {% if notifications.page == page_num %}
+          <a class="btn btn-info mb-4" href="{{url_for('notifications',page = page_num,user_id =current_user.id,mark_as_read =0)}}">{{page_num}}</a>
+        {% else %}
+          <a class="btn btn-outline-info mb-4" href="{{url_for('notifications',page = page_num,user_id =current_user.id,mark_as_read=0)}}">{{page_num}}</a>
+        {% endif%}
+      {% endif %}
+    {% else %}
+      ...
+    {% endif%}
+  {% endfor %}
+</div>
 {% endblock content %}

@@ -42,6 +42,7 @@
 <!-- end of meetups Displayer -->
 
 <!-- Pagination -->
+<div class='center'>
   {% for page_num in meetups.iter_pages(right_edge = 1,left_edge = 1,left_current = 1,right_current = 2)%}
     {% if page_num %}
       {% if not(meetups.page == 1 and meetups.has_next == False)%}
@@ -56,6 +57,7 @@
       ...
     {% endif%}
   {% endfor %}
+</div>
 <!--  end of Pagination -->
 
 <!-- start of Meetup Creation Modal -->

@@ -1,13 +1,19 @@
 $(document).ready(function(){
 	first =true
-	document.getElementById('filter').onclick = function() {
+	try {
+	    document.getElementById('filter').onclick = function() {
 		department= department=document.getElementById('department').value
 		sort = sort=document.getElementById('sort').value
 		method = method=document.getElementById('method').value
 		first= end =false
 		transition = true
    		getData(department,sort,method,transition)
-   	};
+   		};
+	  } catch (e) {
+	      if (e instanceof TypeError) {
+	          console.log(e)
+	      }
+	  }
 
 	var waiting_timer;                //timer identifier
   	var wait_befor_request = 300;  	  //time in ms

@@ -31,7 +31,7 @@
         </div>
       </article>
   {% endfor %}
-  
+<div class='center'>
   {% for page_num in submits.iter_pages(right_edge = 1,left_edge = 1,left_current = 1,right_current = 2)%}
     {% if page_num %}
       {% if not(submits.page == 1 and submits.has_next == False)%}
@@ -46,4 +46,5 @@
       ...
     {% endif%}
   {% endfor %}
+</div>
 {% endblock content %}
