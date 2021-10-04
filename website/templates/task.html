@@ -64,8 +64,8 @@
   <article class="media content-section">
     <div class="media-body breakAll">
       <div class="article-metadata row">
-        <img class="rounded-circle data-img column" src="{{url_for('static',filename='profile_pics/'+task.author.image_file)}}" style="display:inline-block;">
-        <div style="display: inline-block;">
+        <img class="rounded-circle data-img col-sm-1.5" src="{{url_for('static',filename='profile_pics/'+task.author.image_file)}}" style="display:inline-block;">
+        <div style="display: inline-block;" class='col'>
             <a class="mr-2" href="{{url_for('profile',username = task.author.username)}}">
               {{ task.author.first_name + ' ' + task.author.last_name }}
             </a>

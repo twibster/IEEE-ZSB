@@ -13,8 +13,8 @@
     <article class="media content-section">
         <div class="media-body breakAll">
           <div class="article-metadata row">
-            <img class="rounded-circle data-img column" src="{{url_for('static',filename='profile_pics/'+announcement.announcer.image_file)}}">
-            <div style="display: inline-block;">
+            <img class="rounded-circle data-img col-sm-1.5" src="{{url_for('static',filename='profile_pics/'+announcement.announcer.image_file)}}">
+            <div style="display: inline-block;" class="col">
                 <a class="mr-2" href="{{url_for('profile',username = announcement.announcer.username)}}">{{ announcement.announcer.first_name + ' ' + announcement.announcer.last_name }}</a>
                 <small style="display:block;" class="text-muted">{{display_time(announcement.date_announced)}}
                 </small>

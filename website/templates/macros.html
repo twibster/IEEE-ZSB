@@ -135,9 +135,9 @@
     {% endif %}
     {% for task in tasks %}
         <article class="content-section breakAll">
-            <div class="article-metadata row">
-              <img class="rounded-circle data-img column" src="{{url_for('static',filename='profile_pics/'+task.author.image_file)}}" style="display:inline-block;">
-              <div style="display: inline-block;">
+            <div class="article-metadata row"style='margin-bottom: 10px;'>
+              <img class="rounded-circle data-img col-sm-1.5" src="{{url_for('static',filename='profile_pics/'+task.author.image_file)}}" style="display:inline-block;">
+              <div style="display: inline-block;margin-top: -3px;" class="col">
                   <a class="mr-2" href="{{url_for('profile',username = task.author.username)}}">
                     {{ task.author.first_name + ' ' + task.author.last_name }}
                   </a>

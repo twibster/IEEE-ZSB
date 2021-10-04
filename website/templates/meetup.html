@@ -36,8 +36,8 @@
 <article class="media content-section breakAll">
   <div class="media-body">
       <div class="article-metadata row">
-        <img class="rounded-circle data-img column" src="{{url_for('static',filename='profile_pics/'+meetup.organizer.image_file)}}">
-        <div style="display: inline-block;">
+        <img class="rounded-circle data-img col-sm-1.5" src="{{url_for('static',filename='profile_pics/'+meetup.organizer.image_file)}}">
+        <div style="display: inline-block;" class='col'>
             <a class="mr-2" href="{{url_for('profile',username = meetup.organizer.username)}}">{{ meetup.organizer.first_name + ' ' + meetup.organizer.last_name }}</a>
             <small style='display:block;' class="text-muted">{{display_time(meetup.date_created)}}</small>
             <a class="article-title" href="{{meetup_href}}"><b>{{ meetup.title }}</b></a>

@@ -16,6 +16,12 @@ h1, h2, h3, h4, h5, h6 {
   margin-top: 5px;
   width: inherit;
 }
+.submit-img{
+  height: 55px;
+  width: 55px;
+  margin-right: 15px;
+  margin-left: 5px;
+}
 .author-name{
   color: black;
   font-size: 10px;
@@ -193,7 +199,7 @@ a.notification:hover{
 .data-img {
   height: 55px;
   width: 55px;
-  margin-right: 15px;
+
   margin-left: 5px;
 }
 .account-img {
