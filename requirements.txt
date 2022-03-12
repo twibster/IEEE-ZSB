@@ -10,4 +10,4 @@ Flask_WTF == 0.15.1
 WTForms == 2.3.3
 bcrypt == 3.2.0
 urlextract == 1.3.0
-Pillow == 8.3.2
+Pillow == 9.0.1
